@@ -5,9 +5,10 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
-	"github.com/labstack/echo/v4"
 	echojwt "github.com/labstack/echo-jwt"
+	"github.com/labstack/echo/v4"
 )
 
 func JWTMiddleware() echo.MiddlewareFunc {
@@ -18,22 +19,27 @@ func JWTMiddleware() echo.MiddlewareFunc {
 	})
 }
 
-func CreateToken(userId int) (string, error) {
+func CreateToken(userId uuid.UUID) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
-	claims["userId"] = userId
+	claims["userId"] = userId.String() // Menggunakan string UUID sebagai userID
 	claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-
 }
 
-func ExtractToken(e echo.Context) int {
+func ExtractToken(e echo.Context) uuid.UUID {
 	user := e.Get("user").(*jwt.Token)
 	if user.Valid {
 		claims := user.Claims.(jwt.MapClaims)
-		userId := claims["userId"].(float64)
-		return int(userId)
+		userId := claims["userId"].(string) // Mengambil userID sebagai string UUID
+		parsedID, err := uuid.Parse(userId)
+		if err != nil {
+			// Handle error
+			return uuid.Nil
+		}
+		return parsedID
 	}
-	return 0
+	return uuid.Nil
 }
+

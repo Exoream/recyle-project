@@ -18,8 +18,10 @@ type Main struct {
 
 type UserDataInterface interface {
 	Create(data Main) error
+	CheckLogin(email, password string) (Main, string, error)
 }
 
 type UseCaseInterface interface {
 	Create(data Main) error
+	CheckLogin(email, password string) (Main, string, error)
 }

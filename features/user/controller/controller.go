@@ -49,3 +49,24 @@ func (uco *UserController) CreateUser(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, helper.SuccesResponses("success create data"))
 }
+
+func (s *UserController) LoginUser(c echo.Context) error {
+	var login UserLogin
+	errBind := c.Bind(&login)
+	if errBind != nil {
+		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("eror bind"))
+	}
+
+	user, token, err := s.userUseCase.CheckLogin(login.Email, login.Password)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("login failed"))
+	}
+
+	response := UserLoginResponse{
+		Id:    user.Id,
+		Email: user.Email,
+		Token: token,
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("login successful", response))
+}

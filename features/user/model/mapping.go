@@ -3,7 +3,7 @@ package model
 import "recycle/features/user"
 
 // Mapping dari Main ke Model
-func MappingModel(mainData user.Main) User {
+func MapMainToModel(mainData user.Main) User {
 	return User{
 		Name:        mainData.Name,
 		Email:       mainData.Email,
@@ -15,23 +15,23 @@ func MappingModel(mainData user.Main) User {
 	}
 }
 
-// // Mapping dari Model ke Main
-// func MappingMain(mainData User) user.Main {
-// 	return user.Main{
-// 		Id:          mainData.ID,
-// 		Name:        mainData.Name,
-// 		Email:       mainData.Email,
-// 		Password:    mainData.Password,
-// 		Gender:      mainData.Gender,
-// 		Age:         mainData.Age,
-// 		Address:     mainData.Address,
-// 		SaldoPoints: mainData.SaldoPoints,
-// 		CreatedAt:   mainData.CreatedAt,
-// 		UpdatedAt:   mainData.UpdatedAt,
-// 	}
-// }
+// Mapping dari Model ke Main
+func MapModelToMain(mainData User) user.Main {
+	return user.Main{
+		Id:          mainData.ID,
+		Name:        mainData.Name,
+		Email:       mainData.Email,
+		Password:    mainData.Password,
+		Gender:      mainData.Gender,
+		Age:         mainData.Age,
+		Address:     mainData.Address,
+		SaldoPoints: mainData.SaldoPoints,
+		CreatedAt:   mainData.CreatedAt,
+		UpdatedAt:   mainData.UpdatedAt,
+	}
+}
 
-// func ModelToCoreMapping(dataModel []User) []user.Main {
+// func ModelToMainMapping(dataModel []User) []user.Main {
 // 	var coreList []user.Main
 // 	for _, v := range dataModel {
 // 		coreList = append(coreList, MappingMain(v))
