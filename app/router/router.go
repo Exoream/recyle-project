@@ -15,4 +15,5 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	userController := controller.NewUserControllers(userUsecase)
 
 	e.POST("/users/register", userController.CreateUser)
+	e.POST("/users/login", userController.LoginUser)
 }
