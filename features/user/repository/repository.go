@@ -7,7 +7,6 @@ import (
 	"recycle/features/user/model"
 	"recycle/helper"
 
-
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -48,27 +47,27 @@ func (u *userRepository) Create(user user.Main) error {
 
 // CheckLogin implements user.UserDataInterface.
 func (u *userRepository) CheckLogin(email string, password string) (user.Main, string, error) {
-    var data model.User
+	var data model.User
 
-    tx := u.db.Where("email = ?", email).First(&data)
-    if tx.Error != nil {
-        return user.Main{}, "", tx.Error
-    }
+	tx := u.db.Where("email = ?", email).First(&data)
+	if tx.Error != nil {
+		return user.Main{}, "", tx.Error
+	}
 
-    if helper.CheckPasswordHash(data.Password, password) {
-        id, err := uuid.Parse(data.ID)
-        if err != nil {
-            return user.Main{}, "", err
-        }
+	if helper.CheckPasswordHash(data.Password, password) {
+		id, err := uuid.Parse(data.ID)
+		if err != nil {
+			return user.Main{}, "", err
+		}
 
-        token, errToken := middlewares.CreateToken(id)
-        if errToken != nil {
-            return user.Main{}, "", errToken
-        }
+		token, errToken := middlewares.CreateToken(id)
+		if errToken != nil {
+			return user.Main{}, "", errToken
+		}
 
 		dataMain := model.MapModelToMain(data)
-        return dataMain, token, nil
-    }
+		return dataMain, token, nil
+	}
 
-    return user.Main{}, "", errors.New("Login failed")
+	return user.Main{}, "", errors.New("Login failed")
 }
