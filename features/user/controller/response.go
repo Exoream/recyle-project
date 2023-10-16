@@ -1,25 +1,37 @@
 package controller
 
-type UserResponse struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Email       string `json:"email"`
-	Password    string `json:"password"`
-	Gender      string `json:"gender"`
-	Age         int    `json:"age"`
-	Address     string `json:"address"`
-	SaldoPoints int    `json:"saldo_points"`
-}
+import (
+	"recycle/features/user"
+	"time"
+)
+
 
 type UserLoginResponse struct {
-	Id       string `json:"id"`
-	Email    string `json:"email"`
-	Token    string `json:"token"`
+	Id    string `json:"id"`
+	Email string `json:"email"`
+	Token string `json:"token"`
 }
 
-type UserLogin struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+type UserResponse struct {
+	Id          string    `json:"id"`
+	Name        string    `json:"name"`
+	Email       string    `json:"email"`
+	Gender      string    `json:"gender"`
+	Age         int       `json:"age"`
+	Address     string    `json:"address"`
+	SaldoPoints int       `json:"saldo_points"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
-
+func MainResponse(dataMain user.Main) UserResponse {
+	return UserResponse{
+		Id:          dataMain.Id,
+		Name:        dataMain.Name,
+		Email:       dataMain.Email,
+		Gender:      dataMain.Gender,
+		Age:         dataMain.Age,
+		Address:     dataMain.Address,
+		SaldoPoints: dataMain.SaldoPoints,
+		CreatedAt:   dataMain.CreatedAt,
+	}
+}

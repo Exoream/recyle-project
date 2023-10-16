@@ -71,3 +71,55 @@ func (u *userRepository) CheckLogin(email string, password string) (user.Main, s
 
 	return user.Main{}, "", errors.New("Login failed")
 }
+
+// GetById implements user.UserDataInterface.
+func (u *userRepository) GetById(id string) (user.Main, error) {
+    var userData model.User
+    result := u.db.Where("id = ?", id).First(&userData)
+    if result.Error != nil {
+        return user.Main{}, result.Error
+    }
+
+    var userById = model.MapModelToMain(userData)
+    return userById, nil
+}
+
+// UpdateById implements user.UserDataInterface.
+func (u *userRepository) UpdateById(id string, updated user.Main) (data user.Main, err error) {
+	uuidID, err := uuid.Parse(id)
+    if err != nil {
+        return user.Main{}, err
+    }
+
+    var usersData model.User
+    resultFind := u.db.First(&usersData, uuidID)
+    if resultFind.Error != nil {
+        return user.Main{}, resultFind.Error
+    }
+
+    u.db.Model(&usersData).Updates(model.MapMainToModel(updated))
+
+    data = model.MapModelToMain(usersData)
+    return data, nil
+}
+
+// Delete implements user.UserDataInterface.
+func (u *userRepository) DeleteById(id string) error {
+	uuidID, err := uuid.Parse(id)
+    if err != nil {
+        return err
+    }
+
+	var user model.User
+	result := u.db.Where("id = ?", uuidID).Delete(&user)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return errors.New("failed to delete data, record not found")
+	}
+
+	return nil
+}

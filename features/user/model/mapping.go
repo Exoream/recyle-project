@@ -31,10 +31,10 @@ func MapModelToMain(mainData User) user.Main {
 	}
 }
 
-// func ModelToMainMapping(dataModel []User) []user.Main {
-// 	var coreList []user.Main
-// 	for _, v := range dataModel {
-// 		coreList = append(coreList, MappingMain(v))
-// 	}
-// 	return coreList
-// }
+func ModelToMainMapping(dataModel []User) []user.Main {
+	var mainList []user.Main
+	for _, value := range dataModel {
+		mainList = append(mainList, MapModelToMain(value))
+	}
+	return mainList
+}

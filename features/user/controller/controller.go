@@ -2,10 +2,12 @@ package controller
 
 import (
 	"net/http"
+	"recycle/app/middlewares"
 	"recycle/features/user"
 	"recycle/helper"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,23 +22,14 @@ func NewUserControllers(uc user.UseCaseInterface) *UserController {
 }
 
 func (uco *UserController) CreateUser(c echo.Context) error {
-	dataInput := UserResponse{}
+	dataInput := UserRequest{}
 
 	errBind := c.Bind(&dataInput)
 	if errBind != nil {
 		return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error bind data"))
 	}
 
-	data := user.Main{
-		Id:          dataInput.ID,
-		Name:        dataInput.Name,
-		Email:       dataInput.Email,
-		Password:    dataInput.Password,
-		Gender:      dataInput.Gender,
-		Age:         dataInput.Age,
-		Address:     dataInput.Address,
-		SaldoPoints: dataInput.SaldoPoints,
-	}
+	data := RequestMain(dataInput)
 
 	errCreate := uco.userUseCase.Create(data)
 	if errCreate != nil {
@@ -50,14 +43,14 @@ func (uco *UserController) CreateUser(c echo.Context) error {
 	return c.JSON(http.StatusCreated, helper.SuccesResponses("success create data"))
 }
 
-func (s *UserController) LoginUser(c echo.Context) error {
+func (uco *UserController) LoginUser(c echo.Context) error {
 	var login UserLogin
 	errBind := c.Bind(&login)
 	if errBind != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("eror bind"))
 	}
 
-	user, token, err := s.userUseCase.CheckLogin(login.Email, login.Password)
+	user, token, err := uco.userUseCase.CheckLogin(login.Email, login.Password)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("login failed"))
 	}
@@ -69,4 +62,56 @@ func (s *UserController) LoginUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("login successful", response))
+}
+
+func (uco *UserController) GetUser(c echo.Context) error {
+	idToken := middlewares.ExtractToken(c)
+    if idToken == uuid.Nil {
+        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
+    }
+
+    result, err := uco.userUseCase.GetById(idToken.String())
+
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("error reading data"))
+    }
+
+    var usersResponse = MainResponse(result)
+
+    return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success get profile", usersResponse))
+}
+
+func (uco *UserController) Update(c echo.Context) error {
+	idToken := middlewares.ExtractToken(c)
+	if idToken == uuid.Nil {
+		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
+	}
+
+	userReq := UserRequest{}
+	errBind := c.Bind(&userReq)
+	if errBind != nil {
+		return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error bind data"))
+	}
+
+	userMain := RequestMain(userReq)
+	data, err := uco.userUseCase.UpdateById(idToken.String(), userMain)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success update data", MainResponse(data)))
+}
+
+func (uco *UserController) Delete(c echo.Context) error {
+	idToken := middlewares.ExtractToken(c)
+	if idToken == uuid.Nil {
+		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
+	}
+	
+	err := uco.userUseCase.DeleteById(idToken.String())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccesResponses("success delete user"))
 }

@@ -19,9 +19,15 @@ type Main struct {
 type UserDataInterface interface {
 	Create(data Main) error
 	CheckLogin(email, password string) (Main, string, error)
+	GetById(id string) (Main, error)
+	UpdateById(id string, updated Main) (data Main, err error)
+	DeleteById(id string) error
 }
 
 type UseCaseInterface interface {
 	Create(data Main) error
 	CheckLogin(email, password string) (Main, string, error)
+	GetById(id string) (Main, error)
+	UpdateById(id string, updated Main) (data Main, err error)
+	DeleteById(id string) error
 }
