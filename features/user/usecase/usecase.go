@@ -2,10 +2,12 @@ package usecase
 
 import (
 	"errors"
+	"recycle/app/middlewares"
 	"recycle/features/user"
 	"recycle/helper"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 )
 
 type userUseCase struct {
@@ -41,13 +43,27 @@ func (uc *userUseCase) CheckLogin(email string, password string) (user.Main, str
 		return user.Main{}, "", errors.New("error validation: email dan password harus diisi")
 	}
 
-	// data, err := uc.userRepo.GetByEmail(email)
-	// if err != nil {
-	//     return user.Main{}, "", err
-	// }
+	dataLogin, err := uc.userRepo.CheckLogin(email, password)
 
-	dataLogin, token, err := uc.userRepo.CheckLogin(email, password)
-	return dataLogin, token, err
+	if err != nil {
+		return user.Main{}, "", err
+	}
+
+	id, err := uuid.Parse(dataLogin.Id)
+	if err != nil {
+		return user.Main{}, "", err
+	}
+
+	if helper.CheckPasswordHash(dataLogin.Password, password) {
+		token, err := middlewares.CreateToken(id)
+		if err != nil {
+			return user.Main{}, "", err
+		}
+
+		return dataLogin, token, nil
+	}
+
+	return user.Main{}, "", errors.New("Login failed")
 }
 
 // GetById implements user.UseCaseInterface.
@@ -88,10 +104,10 @@ func (uc *userUseCase) DeleteById(id string) error {
 	}
 
 	err := uc.userRepo.DeleteById(id)
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 
-    return nil
-	
+	return nil
+
 }
