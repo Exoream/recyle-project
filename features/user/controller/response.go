@@ -35,3 +35,13 @@ func MainResponse(dataMain user.Main) UserResponse {
 		CreatedAt:   dataMain.CreatedAt,
 	}
 }
+
+func LoginResponse(id, email, token string) UserLoginResponse {
+    return UserLoginResponse{
+        Id:    id,
+        Email: email,
+        Token: token,
+    }
+}
+
+

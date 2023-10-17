@@ -22,6 +22,7 @@ type UserDataInterface interface {
 	GetById(id string) (Main, error)
 	UpdateById(id string, updated Main) (data Main, err error)
 	DeleteById(id string) error
+	FindAllUsers() ([]Main, error)
 }
 
 type UseCaseInterface interface {
@@ -30,4 +31,5 @@ type UseCaseInterface interface {
 	GetById(id string) (Main, error)
 	UpdateById(id string, updated Main) (data Main, err error)
 	DeleteById(id string) error
+	FindAllUsers() ([]Main, error)
 }
