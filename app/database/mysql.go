@@ -3,7 +3,8 @@ package database
 import (
 	"fmt"
 	"recycle/app/config"
-	"recycle/features/user/model"
+	user "recycle/features/user/model"
+	rubbish "recycle/features/rubbish/model"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
@@ -22,5 +23,6 @@ func InitMysqlConn(config *config.AppConfig) *gorm.DB {
 }
 
 func Migrate(db *gorm.DB) {
-	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&user.User{})
+	db.AutoMigrate(&rubbish.Rubbish{})
 }
