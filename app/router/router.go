@@ -15,10 +15,11 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	userUsecase := usecase.NewUserUsecase(userRepository)
 	userController := controller.NewUserControllers(userUsecase)
 
-	// User CRUD
+	// User & Admin CRUD 
 	e.POST("/users/register", userController.CreateUser)
-	e.POST("/users/login", userController.LoginUser)
-	e.GET("/users", userController.GetUser, middlewares.JWTMiddleware())
-	e.PUT("/users", userController.Update, middlewares.JWTMiddleware())
-	e.DELETE("/users", userController.Delete, middlewares.JWTMiddleware())
+	e.POST("/users/login", userController.Login)
+	e.GET("/users", userController.GetAllUser, middlewares.JWTMiddleware())
+	e.GET("/users/:id", userController.GetUser, middlewares.JWTMiddleware())
+	e.PUT("/users/:id", userController.Update, middlewares.JWTMiddleware())
+	e.DELETE("/users/:id", userController.Delete, middlewares.JWTMiddleware())
 }

@@ -108,3 +108,17 @@ func (u *userRepository) DeleteById(id string) error {
 
 	return nil
 }
+
+// FindAllUsers implements user.UserDataInterface.
+func (u *userRepository) FindAllUsers() ([]user.Main, error) {
+	var users []model.User
+
+	err := u.db.Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var allUser []user.Main = model.ModelToMainMapping(users)
+
+	return allUser, nil
+}

@@ -55,7 +55,7 @@ func (uc *userUseCase) CheckLogin(email string, password string) (user.Main, str
 	}
 
 	if helper.CheckPasswordHash(dataLogin.Password, password) {
-		token, err := middlewares.CreateToken(id)
+		token, err := middlewares.CreateToken(id, dataLogin.Email)
 		if err != nil {
 			return user.Main{}, "", err
 		}
@@ -110,4 +110,13 @@ func (uc *userUseCase) DeleteById(id string) error {
 
 	return nil
 
+}
+
+// FindAllUsers implements user.UseCaseInterface.
+func (uc *userUseCase) FindAllUsers() ([]user.Main, error) {
+	users, err := uc.userRepo.FindAllUsers()
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }
