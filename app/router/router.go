@@ -2,24 +2,42 @@ package router
 
 import (
 	"recycle/app/middlewares"
-	"recycle/features/user/controller"
-	"recycle/features/user/repository"
-	"recycle/features/user/usecase"
+	userController "recycle/features/user/controller"
+	userRepository "recycle/features/user/repository"
+	userUsecase "recycle/features/user/usecase"
+
+	rubbishController "recycle/features/rubbish/controller"
+	rubbishRepository "recycle/features/rubbish/repository"
+	rubbishUsecase "recycle/features/rubbish/usecase"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 func NewRoute(e *echo.Echo, db *gorm.DB) {
-	userRepository := repository.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepository)
-	userController := controller.NewUserControllers(userUsecase)
+	// User
+	userRepository := userRepository.NewUserRepository(db)
+	userUsecase := userUsecase.NewUserUsecase(userRepository)
+	userController := userController.NewUserControllers(userUsecase)
 
-	// User & Admin CRUD 
-	e.POST("/users/register", userController.CreateUser)
-	e.POST("/users/login", userController.Login)
-	e.GET("/users", userController.GetAllUser, middlewares.JWTMiddleware())
-	e.GET("/users/:id", userController.GetUser, middlewares.JWTMiddleware())
-	e.PUT("/users/:id", userController.Update, middlewares.JWTMiddleware())
-	e.DELETE("/users/:id", userController.Delete, middlewares.JWTMiddleware())
+	// Rubbish
+	rubbishRepository := rubbishRepository.NewRubbishRepository(db)
+	rubbishUsecase := rubbishUsecase.NewRubbishUsecase(rubbishRepository)
+	rubbishController := rubbishController.NewRubbishControllers(rubbishUsecase)
+
+	// User & Admin CRUD
+	user := e.Group("/users") 
+	user.POST("/register", userController.CreateUser)
+	user.POST("/login", userController.Login)
+	user.GET("", userController.GetAllUser, middlewares.JWTMiddleware())
+	user.GET("/:id", userController.GetUser, middlewares.JWTMiddleware())
+	user.PUT("/:id", userController.Update, middlewares.JWTMiddleware())
+	user.DELETE("/:id", userController.Delete, middlewares.JWTMiddleware())
+
+	rubbish := e.Group("/rubbish")
+	rubbish.POST("", rubbishController.CreateRubbish, middlewares.JWTMiddleware())
+	rubbish.GET("", rubbishController.GetAllRubbish, middlewares.JWTMiddleware())
+	rubbish.GET("/:id", rubbishController.GetRubbish, middlewares.JWTMiddleware())
+	rubbish.PUT("/:id", rubbishController.UpdateRubbish, middlewares.JWTMiddleware())
+	rubbish.DELETE("/:id", rubbishController.DeleteRubbish, middlewares.JWTMiddleware())
 }
