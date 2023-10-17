@@ -2,7 +2,6 @@ package controller
 
 import (
 	"recycle/features/rubbish"
-	"time"
 )
 
 type RubbishRespon struct {
@@ -11,7 +10,6 @@ type RubbishRespon struct {
 	TypeRubbish string    `json:"type_rubbish"`
 	PointPerKg  int       `json:"point_per_kg"`
 	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"created_at"`
 }
 
 func MainResponse(dataMain rubbish.Main) RubbishRespon {
@@ -21,6 +19,5 @@ func MainResponse(dataMain rubbish.Main) RubbishRespon {
 		TypeRubbish: dataMain.TypeRubbish,
 		PointPerKg:  dataMain.PointPerKg,
 		Description: dataMain.Description,
-		CreatedAt:   dataMain.CreatedAt,
 	}
 }
