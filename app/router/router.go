@@ -6,9 +6,9 @@ import (
 	userRepository "recycle/features/user/repository"
 	userUsecase "recycle/features/user/usecase"
 
-	rubbishController "recycle/features/rubbish/controller"
-	rubbishRepository "recycle/features/rubbish/repository"
-	rubbishUsecase "recycle/features/rubbish/usecase"
+	// rubbishController "recycle/features/rubbish/controller"
+	// rubbishRepository "recycle/features/rubbish/repository"
+	// rubbishUsecase "recycle/features/rubbish/usecase"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -21,9 +21,9 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	userController := userController.NewUserControllers(userUsecase)
 
 	// Rubbish
-	rubbishRepository := rubbishRepository.NewRubbishRepository(db)
-	rubbishUsecase := rubbishUsecase.NewRubbishUsecase(rubbishRepository)
-	rubbishController := rubbishController.NewRubbishControllers(rubbishUsecase)
+	// rubbishRepository := rubbishRepository.NewRubbishRepository(db)
+	// rubbishUsecase := rubbishUsecase.NewRubbishUsecase(rubbishRepository)
+	// rubbishController := rubbishController.NewRubbishControllers(rubbishUsecase)
 
 	// User & Admin CRUD
 	user := e.Group("/users") 
@@ -34,10 +34,10 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	user.PUT("/:id", userController.Update, middlewares.JWTMiddleware())
 	user.DELETE("/:id", userController.Delete, middlewares.JWTMiddleware())
 
-	rubbish := e.Group("/rubbish")
-	rubbish.POST("", rubbishController.CreateRubbish, middlewares.JWTMiddleware())
-	rubbish.GET("", rubbishController.GetAllRubbish, middlewares.JWTMiddleware())
-	rubbish.GET("/:id", rubbishController.GetRubbish, middlewares.JWTMiddleware())
-	rubbish.PUT("/:id", rubbishController.UpdateRubbish, middlewares.JWTMiddleware())
-	rubbish.DELETE("/:id", rubbishController.DeleteRubbish, middlewares.JWTMiddleware())
+// 	rubbish := e.Group("/rubbish")
+// 	rubbish.POST("", rubbishController.CreateRubbish, middlewares.JWTMiddleware())
+// 	rubbish.GET("", rubbishController.GetAllRubbish, middlewares.JWTMiddleware())
+// 	rubbish.GET("/:id", rubbishController.GetRubbish, middlewares.JWTMiddleware())
+// 	rubbish.PUT("/:id", rubbishController.UpdateRubbish, middlewares.JWTMiddleware())
+// 	rubbish.DELETE("/:id", rubbishController.DeleteRubbish, middlewares.JWTMiddleware())
 }

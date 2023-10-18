@@ -20,15 +20,16 @@ func JWTMiddleware() echo.MiddlewareFunc {
 	})
 }
 
-func CreateToken(userId uuid.UUID, email string) (string, error) {
-	claims := jwt.MapClaims{}
-	claims["authorized"] = true
-	claims["userId"] = userId.String() // Menggunakan string UUID sebagai userID
-	claims["email"] = email
-	claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+func CreateToken(userId uuid.UUID, role string) (string, error) {
+    claims := jwt.MapClaims{}
+    claims["authorized"] = true
+    claims["userId"] = userId.String()
+    claims["role"] = role
+    claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+    return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }
+
 
 func ExtractToken(e echo.Context) uuid.UUID {
 	user := e.Get("user").(*jwt.Token)
@@ -45,12 +46,13 @@ func ExtractToken(e echo.Context) uuid.UUID {
 	return uuid.Nil
 }
 
-func ExtractUserEmail(c echo.Context) (string, error) {
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	email, ok := claims["email"].(string)
-	if !ok {
-		return "", errors.New("Email not found in JWT claims")
-	}
-	return email, nil
+func ExtractRole(c echo.Context) (string, error) {
+    user := c.Get("user").(*jwt.Token)
+    claims := user.Claims.(jwt.MapClaims)
+    role, ok := claims["role"].(string)
+    if !ok {
+        return "", errors.New("role not found in token claims")
+    }
+    return role, nil
 }
+

@@ -1,4 +1,4 @@
-package user
+package entity
 
 import "time"
 
@@ -11,6 +11,7 @@ type Main struct {
 	Age         int
 	Address     string
 	SaldoPoints int
+	Role		string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   *time.Time

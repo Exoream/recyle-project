@@ -1,6 +1,6 @@
 package controller
 
-import "recycle/features/user"
+import "recycle/features/user/entity"
 
 type UserRequest struct {
 	ID          string `json:"id"`
@@ -18,8 +18,8 @@ type UserLogin struct {
 	Password string `json:"password"`
 }
 
-func RequestMain(dataRequest UserRequest) user.Main {
-	return user.Main{
+func RequestMain(dataRequest UserRequest) entity.Main {
+	return entity.Main{
 		Id:          dataRequest.ID,
 		Name:        dataRequest.Name,
 		Email:       dataRequest.Email,
