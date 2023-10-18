@@ -3,7 +3,7 @@ package controller
 import (
 	"net/http"
 	"recycle/app/middlewares"
-	"recycle/features/user"
+	"recycle/features/user/entity"
 	"recycle/helper"
 	"strings"
 
@@ -12,10 +12,10 @@ import (
 )
 
 type UserController struct {
-	userUseCase user.UseCaseInterface
+	userUseCase entity.UseCaseInterface
 }
 
-func NewUserControllers(uc user.UseCaseInterface) *UserController {
+func NewUserControllers(uc entity.UseCaseInterface) *UserController {
 	return &UserController{
 		userUseCase: uc,
 	}
@@ -71,9 +71,9 @@ func (uco *UserController) GetUser(c echo.Context) error {
 	}
     
     // Mendapatkan email pengguna dari token
-    userEmail, err := middlewares.ExtractUserEmail(c)
+    role, err := middlewares.ExtractRole(c)
     if err != nil {
-        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting user email"))
+        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting role"))
     }
 
     idParamStr := c.Param("id")
@@ -83,7 +83,7 @@ func (uco *UserController) GetUser(c echo.Context) error {
     }
 
     // Periksa apakah ID dari token sama dengan ID dari parameter URL.
-    if idToken.String() == idParam.String() || userEmail == "admin@gmail.com" {
+    if idToken.String() == idParam.String() || role == "admin" {
         // Jika sesuai, izinkan akses ke profil pengguna.
         result, err := uco.userUseCase.GetById(idParam.String())
         if err != nil {
@@ -101,16 +101,16 @@ func (uco *UserController) GetUser(c echo.Context) error {
 
 
 func (uco *UserController) Update(c echo.Context) error {
-    // Extra token dari id
+    // Extra token from id
     idToken := middlewares.ExtractToken(c)
     if idToken == uuid.Nil {
         return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
     }
 
-    // Mendapatkan email pengguna dari token
-    userEmail, err := middlewares.ExtractUserEmail(c)
+    // Extract the user's role from the token
+    role, err := middlewares.ExtractRole(c)
     if err != nil {
-        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting user email"))
+        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting role"))
     }
 
     idParamStr := c.Param("id")
@@ -119,14 +119,29 @@ func (uco *UserController) Update(c echo.Context) error {
         return c.JSON(http.StatusBadRequest, helper.ErrorResponse("Invalid UUID format"))
     }
 
-    if idToken.String() == idParam.String() || userEmail == "admin@gmail.com" {
+    
+    userData, err := uco.userUseCase.GetById(idParam.String())
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("error retrieving user data"))
+    }
+
+    if idToken.String() == idParam.String() || role == "admin" {
         userReq := UserRequest{}
         errBind := c.Bind(&userReq)
         if errBind != nil {
-            return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error bind data"))
+            return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error binding data"))
         }
 
         userMain := RequestMain(userReq)
+
+        if role != "admin" && userMain.SaldoPoints != userData.SaldoPoints {
+            return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("You do not have permission to update 'saldo_points'"))
+        }
+
+        if role != "admin" && userMain.Role != userData.Role {
+            return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("You do not have permission to update 'role'"))
+        }
+
         data, err := uco.userUseCase.UpdateById(idParam.String(), userMain)
         if err != nil {
             return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
@@ -134,7 +149,7 @@ func (uco *UserController) Update(c echo.Context) error {
 
         return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success update data", MainResponse(data)))
     } else {
-        // Jika bukan admin dan bukan pemilik data, kembalikan pesan "unauthorized".
+        // If it's not an admin or the data owner, return an "unauthorized" response
         return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
     }
 }
@@ -148,9 +163,9 @@ func (uco *UserController) Delete(c echo.Context) error {
     }
 
     // Mendapatkan email pengguna dari token
-    userEmail, err := middlewares.ExtractUserEmail(c)
+    role, err := middlewares.ExtractRole(c)
     if err != nil {
-        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting user email"))
+        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting role"))
     }
 
     idParamStr := c.Param("id")
@@ -159,7 +174,7 @@ func (uco *UserController) Delete(c echo.Context) error {
         return c.JSON(http.StatusBadRequest, helper.ErrorResponse("Invalid UUID format"))
     }
 
-    if idToken.String() == idParam.String() || userEmail == "admin@gmail.com" {
+    if idToken.String() == idParam.String() || role == "admin" {
         err := uco.userUseCase.DeleteById(idParam.String())
         if err != nil {
             return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
@@ -174,13 +189,13 @@ func (uco *UserController) Delete(c echo.Context) error {
 
 
 func (uco *UserController) GetAllUser(c echo.Context) error {
-    // Mendapatkan email pengguna dari token
-    userEmail, err := middlewares.ExtractUserEmail(c)
+    // Mendapatkan role pengguna dari token
+    role, err := middlewares.ExtractRole(c)
     if err != nil {
-        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting user email"))
+        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting role"))
     }
 
-    if userEmail != "admin@gmail.com" {
+    if role != "admin" {
         return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
     }
 

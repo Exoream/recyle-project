@@ -3,7 +3,7 @@ package usecase
 import (
 	"errors"
 	"recycle/app/middlewares"
-	"recycle/features/user"
+	"recycle/features/user/entity"
 	"recycle/helper"
 
 	"github.com/go-playground/validator/v10"
@@ -11,11 +11,11 @@ import (
 )
 
 type userUseCase struct {
-	userRepo user.UserDataInterface
+	userRepo entity.UserDataInterface
 	validate *validator.Validate
 }
 
-func NewUserUsecase(userRepo user.UserDataInterface) user.UseCaseInterface {
+func NewUserUsecase(userRepo entity.UserDataInterface) entity.UseCaseInterface {
 	return &userUseCase{
 		userRepo: userRepo,
 		validate: validator.New(),
@@ -23,7 +23,7 @@ func NewUserUsecase(userRepo user.UserDataInterface) user.UseCaseInterface {
 }
 
 // Create implements user.UseCaseInterface.
-func (uc *userUseCase) Create(data user.Main) error {
+func (uc *userUseCase) Create(data entity.Main) error {
 	errValidate := uc.validate.Struct(data)
 	if errValidate != nil {
 		return errValidate
@@ -38,38 +38,38 @@ func (uc *userUseCase) Create(data user.Main) error {
 }
 
 // CheckLogin implements user.UseCaseInterface.
-func (uc *userUseCase) CheckLogin(email string, password string) (user.Main, string, error) {
+func (uc *userUseCase) CheckLogin(email string, password string) (entity.Main, string, error) {
 	if email == "" || password == "" {
-		return user.Main{}, "", errors.New("error validation: email dan password harus diisi")
+		return entity.Main{}, "", errors.New("error validation: email dan password harus diisi")
 	}
 
 	dataLogin, err := uc.userRepo.CheckLogin(email, password)
 
 	if err != nil {
-		return user.Main{}, "", err
+		return entity.Main{}, "", err
 	}
 
 	id, err := uuid.Parse(dataLogin.Id)
 	if err != nil {
-		return user.Main{}, "", err
+		return entity.Main{}, "", err
 	}
 
 	if helper.CheckPasswordHash(dataLogin.Password, password) {
-		token, err := middlewares.CreateToken(id, dataLogin.Email)
+		token, err := middlewares.CreateToken(id, dataLogin.Role)
 		if err != nil {
-			return user.Main{}, "", err
+			return entity.Main{}, "", err
 		}
 
 		return dataLogin, token, nil
 	}
 
-	return user.Main{}, "", errors.New("Login failed")
+	return entity.Main{}, "", errors.New("Login failed")
 }
 
 // GetById implements user.UseCaseInterface.
-func (uc *userUseCase) GetById(id string) (user.Main, error) {
+func (uc *userUseCase) GetById(id string) (entity.Main, error) {
 	if id == "" {
-		return user.Main{}, errors.New("invalid id")
+		return entity.Main{}, errors.New("invalid id")
 	}
 
 	idUser, err := uc.userRepo.GetById(id)
@@ -77,22 +77,22 @@ func (uc *userUseCase) GetById(id string) (user.Main, error) {
 }
 
 // UpdateById implements user.UseCaseInterface.
-func (uc *userUseCase) UpdateById(id string, updated user.Main) (data user.Main, err error) {
+func (uc *userUseCase) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
 	if id == "" {
-		return user.Main{}, errors.New("id not found")
+		return entity.Main{}, errors.New("id not found")
 	}
 
 	if updated.Password != "" {
 		hash, hashErr := helper.HashPassword(updated.Password)
 		if hashErr != nil {
-			return user.Main{}, hashErr
+			return entity.Main{}, hashErr
 		}
 		updated.Password = hash
 	}
 
 	data, err = uc.userRepo.UpdateById(id, updated)
 	if err != nil {
-		return user.Main{}, err
+		return entity.Main{}, err
 	}
 	return data, nil
 }
@@ -113,7 +113,7 @@ func (uc *userUseCase) DeleteById(id string) error {
 }
 
 // FindAllUsers implements user.UseCaseInterface.
-func (uc *userUseCase) FindAllUsers() ([]user.Main, error) {
+func (uc *userUseCase) FindAllUsers() ([]entity.Main, error) {
 	users, err := uc.userRepo.FindAllUsers()
 	if err != nil {
 		return nil, err

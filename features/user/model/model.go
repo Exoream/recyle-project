@@ -15,6 +15,7 @@ type User struct {
 	Age         int            `json:"age"`
 	Address     string         `gorm:"type:longtext" json:"address"`
 	SaldoPoints int            `json:"saldo_points"`
+	Role        string         `json:"role"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index"`

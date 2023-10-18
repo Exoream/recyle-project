@@ -2,7 +2,7 @@ package repository
 
 import (
 	"errors"
-	"recycle/features/user"
+	"recycle/features/user/entity"
 	"recycle/features/user/model"
 	"recycle/helper"
 
@@ -14,14 +14,14 @@ type userRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) user.UserDataInterface {
+func NewUserRepository(db *gorm.DB) entity.UserDataInterface {
 	return &userRepository{
 		db: db,
 	}
 }
 
 // Create implements user.UserDataInterface.
-func (u *userRepository) Create(user user.Main) error {
+func (u *userRepository) Create(user entity.Main) error {
 	newUUID, err := uuid.NewRandom()
 	if err != nil {
 		return err
@@ -35,6 +35,8 @@ func (u *userRepository) Create(user user.Main) error {
 	dataInput := model.MapMainToModel(user)
 	dataInput.ID = newUUID.String()
 	dataInput.Password = hashedPassword
+	dataInput.SaldoPoints = 0
+	dataInput.Role = "user"
 
 	tx := u.db.Create(&dataInput)
 	if tx.Error != nil {
@@ -45,12 +47,12 @@ func (u *userRepository) Create(user user.Main) error {
 }
 
 // CheckLogin implements user.UserDataInterface.
-func (u *userRepository) CheckLogin(email string, password string) (user.Main, error) {
+func (u *userRepository) CheckLogin(email string, password string) (entity.Main, error) {
 	var data model.User
 
     tx := u.db.Where("email = ?", email).First(&data)
     if tx.Error != nil {
-        return user.Main{}, tx.Error
+        return entity.Main{}, tx.Error
     }
 
     dataMain := model.MapModelToMain(data)
@@ -58,11 +60,11 @@ func (u *userRepository) CheckLogin(email string, password string) (user.Main, e
 }
 
 // GetById implements user.UserDataInterface.
-func (u *userRepository) GetById(id string) (user.Main, error) {
+func (u *userRepository) GetById(id string) (entity.Main, error) {
     var userData model.User
     result := u.db.Where("id = ?", id).First(&userData)
     if result.Error != nil {
-        return user.Main{}, result.Error
+        return entity.Main{}, result.Error
     }
 
     var userById = model.MapModelToMain(userData)
@@ -70,16 +72,16 @@ func (u *userRepository) GetById(id string) (user.Main, error) {
 }
 
 // UpdateById implements user.UserDataInterface.
-func (u *userRepository) UpdateById(id string, updated user.Main) (data user.Main, err error) {
+func (u *userRepository) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
 	uuidID, err := uuid.Parse(id)
     if err != nil {
-        return user.Main{}, err
+        return entity.Main{}, err
     }
 
     var usersData model.User
     resultFind := u.db.First(&usersData, uuidID)
     if resultFind.Error != nil {
-        return user.Main{}, resultFind.Error
+        return entity.Main{}, resultFind.Error
     }
 
     u.db.Model(&usersData).Updates(model.MapMainToModel(updated))
@@ -110,7 +112,7 @@ func (u *userRepository) DeleteById(id string) error {
 }
 
 // FindAllUsers implements user.UserDataInterface.
-func (u *userRepository) FindAllUsers() ([]user.Main, error) {
+func (u *userRepository) FindAllUsers() ([]entity.Main, error) {
 	var users []model.User
 
 	err := u.db.Find(&users).Error
@@ -118,7 +120,7 @@ func (u *userRepository) FindAllUsers() ([]user.Main, error) {
 		return nil, err
 	}
 
-	var allUser []user.Main = model.ModelToMainMapping(users)
+	var allUser []entity.Main = model.ModelToMainMapping(users)
 
 	return allUser, nil
 }

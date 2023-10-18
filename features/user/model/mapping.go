@@ -1,9 +1,9 @@
 package model
 
-import "recycle/features/user"
+import "recycle/features/user/entity"
 
 // Mapping dari Main ke Model
-func MapMainToModel(mainData user.Main) User {
+func MapMainToModel(mainData entity.Main) User {
 	return User{
 		Name:        mainData.Name,
 		Email:       mainData.Email,
@@ -12,12 +12,13 @@ func MapMainToModel(mainData user.Main) User {
 		Age:         mainData.Age,
 		Address:     mainData.Address,
 		SaldoPoints: mainData.SaldoPoints,
+		Role:        mainData.Role,
 	}
 }
 
 // Mapping dari Model ke Main
-func MapModelToMain(mainData User) user.Main {
-	return user.Main{
+func MapModelToMain(mainData User) entity.Main {
+	return entity.Main{
 		Id:          mainData.ID,
 		Name:        mainData.Name,
 		Email:       mainData.Email,
@@ -26,13 +27,14 @@ func MapModelToMain(mainData User) user.Main {
 		Age:         mainData.Age,
 		Address:     mainData.Address,
 		SaldoPoints: mainData.SaldoPoints,
+		Role:        mainData.Role,
 		CreatedAt:   mainData.CreatedAt,
 		UpdatedAt:   mainData.UpdatedAt,
 	}
 }
 
-func ModelToMainMapping(dataModel []User) []user.Main {
-	var mainList []user.Main
+func ModelToMainMapping(dataModel []User) []entity.Main {
+	var mainList []entity.Main
 	for _, value := range dataModel {
 		mainList = append(mainList, MapModelToMain(value))
 	}

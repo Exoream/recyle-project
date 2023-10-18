@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"recycle/features/user"
+	"recycle/features/user/entity"
 	"time"
 )
 
@@ -23,7 +23,7 @@ type UserResponse struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-func MainResponse(dataMain user.Main) UserResponse {
+func MainResponse(dataMain entity.Main) UserResponse {
 	return UserResponse{
 		Id:          dataMain.Id,
 		Name:        dataMain.Name,
