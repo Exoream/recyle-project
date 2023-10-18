@@ -1,6 +1,6 @@
 package controller
 
-import "recycle/features/rubbish"
+import "recycle/features/rubbish/entity"
 
 type RubbishRequest struct {
 	Id          string `json:"id"`
@@ -10,8 +10,8 @@ type RubbishRequest struct {
 	Description string `json:"description"`
 }
 
-func RequestMain(dataRequest RubbishRequest) rubbish.Main {
-	return rubbish.Main{
+func RequestMain(dataRequest RubbishRequest) entity.Main {
+	return entity.Main{
 		Id:          dataRequest.Id,
 		Name:        dataRequest.Name,
 		TypeRubbish: dataRequest.TypeRubbish,

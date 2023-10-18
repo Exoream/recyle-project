@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"recycle/features/rubbish"
+	"recycle/features/rubbish/entity"
 )
 
 type RubbishRespon struct {
@@ -12,7 +12,7 @@ type RubbishRespon struct {
 	Description string    `json:"description"`
 }
 
-func MainResponse(dataMain rubbish.Main) RubbishRespon {
+func MainResponse(dataMain entity.Main) RubbishRespon {
 	return RubbishRespon{
 		Id:          dataMain.Id,
 		Name:        dataMain.Name,

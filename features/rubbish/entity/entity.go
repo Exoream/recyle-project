@@ -1,4 +1,4 @@
-package rubbish
+package entity
 
 import "time"
 

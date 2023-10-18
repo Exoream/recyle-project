@@ -1,9 +1,9 @@
 package model
 
-import "recycle/features/rubbish"
+import "recycle/features/rubbish/entity"
 
 // Mapping dari Main ke Model
-func MapMainToModel(mainData rubbish.Main) Rubbish {
+func MapMainToModel(mainData entity.Main) Rubbish {
 	return Rubbish{
 		Name:        mainData.Name,
 		TypeRubbish: mainData.TypeRubbish,
@@ -13,8 +13,8 @@ func MapMainToModel(mainData rubbish.Main) Rubbish {
 }
 
 // Mapping dari Model ke Main
-func MapModelToMain(mainData Rubbish) rubbish.Main {
-	return rubbish.Main{
+func MapModelToMain(mainData Rubbish) entity.Main {
+	return entity.Main{
 		Id:          mainData.Id,
 		Name:        mainData.Name,
 		TypeRubbish: mainData.TypeRubbish,
@@ -25,8 +25,8 @@ func MapModelToMain(mainData Rubbish) rubbish.Main {
 	}
 }
 
-func ModelToMainMapping(dataModel []Rubbish) []rubbish.Main {
-	var mainList []rubbish.Main
+func ModelToMainMapping(dataModel []Rubbish) []entity.Main {
+	var mainList []entity.Main
 	for _, value := range dataModel {
 		mainList = append(mainList, MapModelToMain(value))
 	}

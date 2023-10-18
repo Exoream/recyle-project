@@ -2,17 +2,17 @@ package usecase
 
 import (
 	"errors"
-	"recycle/features/rubbish"
+	"recycle/features/rubbish/entity"
 
 	"github.com/go-playground/validator/v10"
 )
 
 type userUseCase struct {
-	rubbishRepo rubbish.RubbishDataInterface
+	rubbishRepo entity.RubbishDataInterface
 	validate *validator.Validate
 }
 
-func NewRubbishUsecase(rubbishRepo rubbish.RubbishDataInterface) rubbish.UseCaseInterface {
+func NewRubbishUsecase(rubbishRepo entity.RubbishDataInterface) entity.UseCaseInterface {
 	return &userUseCase{
 		rubbishRepo: rubbishRepo,
 		validate: validator.New(),
@@ -20,7 +20,7 @@ func NewRubbishUsecase(rubbishRepo rubbish.RubbishDataInterface) rubbish.UseCase
 }
 
 // Create implements rubbish.UseCaseInterface.
-func (uc *userUseCase) Create(data rubbish.Main) error {
+func (uc *userUseCase) Create(data entity.Main) error {
 	errValidate := uc.validate.Struct(data)
 	if errValidate != nil {
 		return errValidate
@@ -49,7 +49,7 @@ func (uc *userUseCase) DeleteById(id string) error {
 }
 
 // FindAllUsers implements rubbish.UseCaseInterface.
-func (uc *userUseCase) FindAllRubbish() ([]rubbish.Main, error) {
+func (uc *userUseCase) FindAllRubbish() ([]entity.Main, error) {
 	rubbish, err := uc.rubbishRepo.FindAllRubbish()
 	if err != nil {
 		return nil, err
@@ -58,9 +58,9 @@ func (uc *userUseCase) FindAllRubbish() ([]rubbish.Main, error) {
 }
 
 // GetById implements rubbish.UseCaseInterface.
-func (uc *userUseCase) GetById(id string) (rubbish.Main, error) {
+func (uc *userUseCase) GetById(id string) (entity.Main, error) {
 	if id == "" {
-		return rubbish.Main{}, errors.New("invalid id")
+		return entity.Main{}, errors.New("invalid id")
 	}
 
 	idRubbish, err := uc.rubbishRepo.GetById(id)
@@ -68,14 +68,14 @@ func (uc *userUseCase) GetById(id string) (rubbish.Main, error) {
 }
 
 // UpdateById implements rubbish.UseCaseInterface.
-func (uc *userUseCase) UpdateById(id string, updated rubbish.Main) (data rubbish.Main, err error) {
+func (uc *userUseCase) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
 	if id == "" {
-		return rubbish.Main{}, errors.New("id not found")
+		return entity.Main{}, errors.New("id not found")
 	}
 
 	data, err = uc.rubbishRepo.UpdateById(id, updated)
 	if err != nil {
-		return rubbish.Main{}, err
+		return entity.Main{}, err
 	}
 	return data, nil
 }
