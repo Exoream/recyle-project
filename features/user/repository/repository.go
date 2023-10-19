@@ -4,7 +4,6 @@ import (
 	"errors"
 	"recycle/features/user/entity"
 	"recycle/features/user/model"
-	"recycle/helper"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -27,16 +26,8 @@ func (u *userRepository) Create(user entity.Main) error {
 		return err
 	}
 
-	hashedPassword, errHash := helper.HashPassword(user.Password)
-	if errHash != nil {
-		return errors.New("error hash password")
-	}
-
 	dataInput := model.MapMainToModel(user)
 	dataInput.ID = newUUID.String()
-	dataInput.Password = hashedPassword
-	dataInput.SaldoPoints = 0
-	dataInput.Role = "user"
 
 	tx := u.db.Create(&dataInput)
 	if tx.Error != nil {
