@@ -10,6 +10,10 @@ import (
 	rubbishRepository "recycle/features/rubbish/repository"
 	rubbishUsecase "recycle/features/rubbish/usecase"
 
+	locationController "recycle/features/location/controller"
+	locationRepository "recycle/features/location/repository"
+	locationUsecase "recycle/features/location/usecase"
+
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -24,6 +28,11 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	rubbishRepository := rubbishRepository.NewRubbishRepository(db)
 	rubbishUsecase := rubbishUsecase.NewRubbishUsecase(rubbishRepository)
 	rubbishController := rubbishController.NewRubbishControllers(rubbishUsecase)
+
+	// Location
+	locationRepository := locationRepository.NewLocationRepository(db)
+	locationUsecase := locationUsecase.NewLocationUsecase(locationRepository)
+	locationController := locationController.NewLocationControllers(locationUsecase)
 
 	// User & Admin CRUD
 	user := e.Group("/users") 
@@ -40,4 +49,12 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	rubbish.GET("/:id", rubbishController.GetRubbish, middlewares.JWTMiddleware())
 	rubbish.PUT("/:id", rubbishController.UpdateRubbish, middlewares.JWTMiddleware())
 	rubbish.DELETE("/:id", rubbishController.DeleteRubbish, middlewares.JWTMiddleware())
+
+	location := e.Group("/location")
+	location.POST("", locationController.CreateLocation, middlewares.JWTMiddleware())
+	location.GET("", locationController.GetAllLocation, middlewares.JWTMiddleware())
+	location.GET("/city", locationController.GetLocationByCity, middlewares.JWTMiddleware())
+	location.GET("/:id", locationController.GetLocation, middlewares.JWTMiddleware())
+	location.PUT("/:id", locationController.UpdateLocation, middlewares.JWTMiddleware())
+	location.DELETE("/:id", locationController.DeleteLocation, middlewares.JWTMiddleware())
 }
