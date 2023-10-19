@@ -29,6 +29,15 @@ func (uc *userUseCase) Create(data entity.Main) error {
 		return errValidate
 	}
 
+	hashedPassword, errHash := helper.HashPassword(data.Password)
+	if errHash != nil {
+		return errors.New("error hash password")
+	}
+
+	data.Password = hashedPassword
+	data.SaldoPoints = 0
+	data.Role = "user"
+
 	err := uc.userRepo.Create(data)
 	if err != nil {
 		return err
