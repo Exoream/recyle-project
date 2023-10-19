@@ -162,5 +162,27 @@ func (uco *RubbishController) GetAllRubbish(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("Success get all user rubbish", rubbishGetAllData))
 }
 
+func (uco *RubbishController) GetRubbishByType(c echo.Context) error {
+    // Extra token dari id
+    idToken := middlewares.ExtractToken(c)
+	if idToken == uuid.Nil {
+		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
+	}
 
+    
+    typeRubbish := c.QueryParam("type")
+    result, err := uco.rubbishUseCase.GetByType(typeRubbish)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("error reading location data"))
+    }
+
+    var rubbishResponse []RubbishRespon
+
+    // Konversi setiap lokasi ke MainResponse
+    for _, rubbish := range result {
+        rubbishResponse = append(rubbishResponse, MainResponse(rubbish))
+    }
+
+    return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success get rubbish", rubbishResponse))
+}
 

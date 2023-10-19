@@ -46,6 +46,7 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	rubbish := e.Group("/rubbish")
 	rubbish.POST("", rubbishController.CreateRubbish, middlewares.JWTMiddleware())
 	rubbish.GET("", rubbishController.GetAllRubbish, middlewares.JWTMiddleware())
+	rubbish.GET("/type", rubbishController.GetRubbishByType, middlewares.JWTMiddleware())
 	rubbish.GET("/:id", rubbishController.GetRubbish, middlewares.JWTMiddleware())
 	rubbish.PUT("/:id", rubbishController.UpdateRubbish, middlewares.JWTMiddleware())
 	rubbish.DELETE("/:id", rubbishController.DeleteRubbish, middlewares.JWTMiddleware())

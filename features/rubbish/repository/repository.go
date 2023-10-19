@@ -102,3 +102,16 @@ func (u *userRepository) UpdateById(id string, updated entity.Main) (data entity
 	data = model.MapModelToMain(rubbishData)
 	return data, nil
 }
+
+// GetByType implements entity.RubbishDataInterface.
+func (u *userRepository) GetByType(typeRubbish string) ([]entity.Main, error) {
+	var typeData []model.Rubbish
+    result := u.db.Where("type_rubbish = ?", typeRubbish).Find(&typeData)
+    if result.Error != nil {
+        return nil, result.Error
+    }
+
+    var rubbish []entity.Main
+	rubbish = model.ModelToMainMapping(typeData)
+    return rubbish, nil
+}
