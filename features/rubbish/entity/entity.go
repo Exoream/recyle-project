@@ -17,6 +17,7 @@ type Main struct {
 type RubbishDataInterface interface {
 	Create(data Main) error
 	GetById(id string) (Main, error)
+	GetByType(typeRubbish string) ([]Main, error)
 	UpdateById(id string, updated Main) (data Main, err error)
 	DeleteById(id string) error
 	FindAllRubbish() ([]Main, error)
@@ -25,6 +26,7 @@ type RubbishDataInterface interface {
 type UseCaseInterface interface {
 	Create(data Main) error
 	GetById(id string) (Main, error)
+	GetByType(typeRubbish string) ([]Main, error)
 	UpdateById(id string, updated Main) (data Main, err error)
 	DeleteById(id string) error
 	FindAllRubbish() ([]Main, error)

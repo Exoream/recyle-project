@@ -9,13 +9,13 @@ import (
 
 type userUseCase struct {
 	rubbishRepo entity.RubbishDataInterface
-	validate *validator.Validate
+	validate    *validator.Validate
 }
 
 func NewRubbishUsecase(rubbishRepo entity.RubbishDataInterface) entity.UseCaseInterface {
 	return &userUseCase{
 		rubbishRepo: rubbishRepo,
-		validate: validator.New(),
+		validate:    validator.New(),
 	}
 }
 
@@ -80,3 +80,12 @@ func (uc *userUseCase) UpdateById(id string, updated entity.Main) (data entity.M
 	return data, nil
 }
 
+// GetByType implements entity.UseCaseInterface.
+func (uc *userUseCase) GetByType(typeRubbish string) ([]entity.Main, error) {
+	if typeRubbish == "" {
+		return nil, errors.New("typeRubbish parameter is required")
+	}
+
+	typeName, err := uc.rubbishRepo.GetByType(typeRubbish)
+	return typeName, err
+}
