@@ -3,6 +3,7 @@ package usecase
 import (
 	"errors"
 	"recycle/features/pickup/entity"
+	"regexp"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -28,6 +29,12 @@ func (uc *pickupUseCase) Create(data entity.Main) error {
 
 	data.Status = "schedule"
 
+	datePattern := `^\d{4}-\d{2}-\d{2}$`
+	matched, _ := regexp.MatchString(datePattern, data.PickupDate)
+	if !matched {
+		return errors.New("PickupDate should be in the format YYYY-MM-DD")
+	}
+	
 	err := uc.pickupRepo.Create(data)
 	if err != nil {
 		return err
