@@ -9,18 +9,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type userRepository struct {
+type rubbishRepository struct {
 	db *gorm.DB
 }
 
 func NewRubbishRepository(db *gorm.DB) entity.RubbishDataInterface {
-	return &userRepository{
+	return &rubbishRepository{
 		db: db,
 	}
 }
 
 // Create implements rubbish.RubbishDataInterface.
-func (u *userRepository) Create(data entity.Main) error {
+func (u *rubbishRepository) Create(data entity.Main) error {
 	newUUID, err := uuid.NewRandom()
 	if err != nil {
 		return err
@@ -38,7 +38,7 @@ func (u *userRepository) Create(data entity.Main) error {
 }
 
 // DeleteById implements rubbish.RubbishDataInterface.
-func (u *userRepository) DeleteById(id string) error {
+func (u *rubbishRepository) DeleteById(id string) error {
 	uuidID, err := uuid.Parse(id)
 	if err != nil {
 		return err
@@ -58,8 +58,8 @@ func (u *userRepository) DeleteById(id string) error {
 	return nil
 }
 
-// FindAllUsers implements rubbish.RubbishDataInterface.
-func (u *userRepository) FindAllRubbish() ([]entity.Main, error) {
+// FindAllrubbish implements rubbish.RubbishDataInterface.
+func (u *rubbishRepository) FindAllRubbish() ([]entity.Main, error) {
 	var trash []model.Rubbish
 
 	err := u.db.Find(&trash).Error
@@ -67,25 +67,25 @@ func (u *userRepository) FindAllRubbish() ([]entity.Main, error) {
 		return nil, err
 	}
 
-	var allUser []entity.Main = model.ModelToMainMapping(trash)
+	var allrubbish []entity.Main = model.ModelToMainMapping(trash)
 
-	return allUser, nil
+	return allrubbish, nil
 }
 
 // GetById implements rubbish.RubbishDataInterface.
-func (u *userRepository) GetById(id string) (entity.Main, error) {
+func (u *rubbishRepository) GetById(id string) (entity.Main, error) {
 	var rubbishData model.Rubbish
 	result := u.db.Where("id = ?", id).First(&rubbishData)
 	if result.Error != nil {
 		return entity.Main{}, result.Error
 	}
 
-	var userById = model.MapModelToMain(rubbishData)
-	return userById, nil
+	var rubbishById = model.MapModelToMain(rubbishData)
+	return rubbishById, nil
 }
 
 // UpdateById implements rubbish.RubbishDataInterface.
-func (u *userRepository) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
+func (u *rubbishRepository) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
 	uuidID, err := uuid.Parse(id)
 	if err != nil {
 		return entity.Main{}, err
@@ -104,7 +104,7 @@ func (u *userRepository) UpdateById(id string, updated entity.Main) (data entity
 }
 
 // GetByType implements entity.RubbishDataInterface.
-func (u *userRepository) GetByType(typeRubbish string) ([]entity.Main, error) {
+func (u *rubbishRepository) GetByType(typeRubbish string) ([]entity.Main, error) {
 	var typeData []model.Rubbish
     result := u.db.Where("type_rubbish = ?", typeRubbish).Find(&typeData)
     if result.Error != nil {
