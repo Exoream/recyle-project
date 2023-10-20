@@ -3,7 +3,7 @@ package controller
 import (
 	"net/http"
 	"recycle/app/middlewares"
-	"recycle/features/user/entity"
+	user "recycle/features/user/entity"
 	"recycle/helper"
 	"strings"
 
@@ -12,10 +12,10 @@ import (
 )
 
 type UserController struct {
-	userUseCase entity.UseCaseInterface
+	userUseCase user.UseCaseInterface
 }
 
-func NewUserControllers(uc entity.UseCaseInterface) *UserController {
+func NewUserControllers(uc user.UseCaseInterface) *UserController {
 	return &UserController{
 		userUseCase: uc,
 	}
@@ -83,7 +83,7 @@ func (uco *UserController) GetUser(c echo.Context) error {
     }
 
     // Periksa apakah ID dari token sama dengan ID dari parameter URL.
-    if idToken.String() == idParam.String() || role == "admin" {
+    if idToken.String() == idParam.String() || role == "admin"{
         // Jika sesuai, izinkan akses ke profil pengguna.
         result, err := uco.userUseCase.GetById(idParam.String())
         if err != nil {
@@ -211,7 +211,7 @@ func (uco *UserController) GetAllUser(c echo.Context) error {
 		userGetAllData = append(userGetAllData, userResponse)
 	}
 
-	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("Success get all user data", userGetAllData))
+	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success get all user data", userGetAllData))
 }
 
 

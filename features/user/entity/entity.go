@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	"recycle/features/pickup/entity"
+	"time"
+)
 
 type Main struct {
 	Id          string
@@ -11,10 +14,11 @@ type Main struct {
 	Age         int
 	Address     string
 	SaldoPoints int
-	Role		string
+	Role        string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   *time.Time
+	Pickups     []entity.Main
 }
 
 type UserDataInterface interface {

@@ -6,6 +6,7 @@ import (
 	user "recycle/features/user/model"
 	rubbish "recycle/features/rubbish/model"
 	location "recycle/features/location/model"
+	pickup "recycle/features/pickup/model"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
@@ -27,4 +28,5 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(&user.User{})
 	db.AutoMigrate(&rubbish.Rubbish{})
 	db.AutoMigrate(&location.Location{})
+	db.AutoMigrate(&pickup.Pickup{})
 }

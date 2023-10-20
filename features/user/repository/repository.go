@@ -4,6 +4,7 @@ import (
 	"errors"
 	"recycle/features/user/entity"
 	"recycle/features/user/model"
+	pick "recycle/features/pickup/model"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -27,7 +28,7 @@ func (u *userRepository) Create(user entity.Main) error {
 	}
 
 	dataInput := model.MapMainToModel(user)
-	dataInput.ID = newUUID.String()
+	dataInput.Id = newUUID.String()
 
 	tx := u.db.Create(&dataInput)
 	if tx.Error != nil {
@@ -41,52 +42,56 @@ func (u *userRepository) Create(user entity.Main) error {
 func (u *userRepository) CheckLogin(email string, password string) (entity.Main, error) {
 	var data model.User
 
-    tx := u.db.Where("email = ?", email).First(&data)
-    if tx.Error != nil {
-        return entity.Main{}, tx.Error
-    }
+	tx := u.db.Where("email = ?", email).First(&data)
+	if tx.Error != nil {
+		return entity.Main{}, tx.Error
+	}
 
-    dataMain := model.MapModelToMain(data)
-    return dataMain, nil
+	dataMain := model.MapModelToMain(data)
+	return dataMain, nil
 }
 
 // GetById implements user.UserDataInterface.
 func (u *userRepository) GetById(id string) (entity.Main, error) {
-    var userData model.User
-    result := u.db.Where("id = ?", id).First(&userData)
-    if result.Error != nil {
-        return entity.Main{}, result.Error
-    }
+	var userData model.User
 
-    var userById = model.MapModelToMain(userData)
-    return userById, nil
+	// Gunakan Preload untuk memuat data pickup terkait.
+	result := u.db.Preload("Pickups").Where("id = ?", id).First(&userData)
+	if result.Error != nil {
+		return entity.Main{}, result.Error
+	}
+
+	var userById = model.MapModelToMain(userData)
+	userById.Pickups = pick.ModelToMainMapping(userData.Pickups)
+	return userById, nil
 }
+
 
 // UpdateById implements user.UserDataInterface.
 func (u *userRepository) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
 	uuidID, err := uuid.Parse(id)
-    if err != nil {
-        return entity.Main{}, err
-    }
+	if err != nil {
+		return entity.Main{}, err
+	}
 
-    var usersData model.User
-    resultFind := u.db.First(&usersData, uuidID)
-    if resultFind.Error != nil {
-        return entity.Main{}, resultFind.Error
-    }
+	var usersData model.User
+	resultFind := u.db.First(&usersData, uuidID)
+	if resultFind.Error != nil {
+		return entity.Main{}, resultFind.Error
+	}
 
-    u.db.Model(&usersData).Updates(model.MapMainToModel(updated))
+	u.db.Model(&usersData).Updates(model.MapMainToModel(updated))
 
-    data = model.MapModelToMain(usersData)
-    return data, nil
+	data = model.MapModelToMain(usersData)
+	return data, nil
 }
 
 // Delete implements user.UserDataInterface.
 func (u *userRepository) DeleteById(id string) error {
 	uuidID, err := uuid.Parse(id)
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 
 	var user model.User
 	result := u.db.Where("id = ?", uuidID).Delete(&user)
@@ -106,7 +111,7 @@ func (u *userRepository) DeleteById(id string) error {
 func (u *userRepository) FindAllUsers() ([]entity.Main, error) {
 	var users []model.User
 
-	err := u.db.Find(&users).Error
+	err := u.db.Preload("Pickups").Find(&users).Error
 	if err != nil {
 		return nil, err
 	}

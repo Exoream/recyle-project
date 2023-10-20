@@ -1,6 +1,11 @@
 package model
 
-import "recycle/features/user/entity"
+import (
+	// "recycle/features/pickup/controller"
+	pick "recycle/features/pickup/entity"
+	"recycle/features/pickup/model"
+	"recycle/features/user/entity"
+)
 
 // Mapping dari Main ke Model
 func MapMainToModel(mainData entity.Main) User {
@@ -19,7 +24,7 @@ func MapMainToModel(mainData entity.Main) User {
 // Mapping dari Model ke Main
 func MapModelToMain(mainData User) entity.Main {
 	return entity.Main{
-		Id:          mainData.ID,
+		Id:          mainData.Id,
 		Name:        mainData.Name,
 		Email:       mainData.Email,
 		Password:    mainData.Password,
@@ -36,7 +41,18 @@ func MapModelToMain(mainData User) entity.Main {
 func ModelToMainMapping(dataModel []User) []entity.Main {
 	var mainList []entity.Main
 	for _, value := range dataModel {
-		mainList = append(mainList, MapModelToMain(value))
+		main := MapModelToMain(value)
+
+		// Ambil data Pickups dan map ke dalam struktur entity.Main
+		var pickups []pick.Main
+		for _, pickup := range value.Pickups {
+			pickupMapped := model.MapModelToMain(pickup)
+			pickups = append(pickups, pickupMapped)
+		}
+		main.Pickups = pickups
+
+		mainList = append(mainList, main)
 	}
 	return mainList
 }
+
