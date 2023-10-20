@@ -9,18 +9,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type userRepository struct {
+type locationRepository struct {
 	db *gorm.DB
 }
 
 func NewLocationRepository(db *gorm.DB) entity.LocationDataInterface {
-	return &userRepository{
+	return &locationRepository{
 		db: db,
 	}
 }
 
 // Create implements entity.LocationDataInterface.
-func (u *userRepository) Create(data entity.Main) error {
+func (u *locationRepository) Create(data entity.Main) error {
 	newUUID, err := uuid.NewRandom()
 	if err != nil {
 		return err
@@ -38,7 +38,7 @@ func (u *userRepository) Create(data entity.Main) error {
 }
 
 // DeleteById implements entity.LocationDataInterface.
-func (u *userRepository) DeleteById(id string) error {
+func (u *locationRepository) DeleteById(id string) error {
 	uuidID, err := uuid.Parse(id)
 	if err != nil {
 		return err
@@ -59,7 +59,7 @@ func (u *userRepository) DeleteById(id string) error {
 }
 
 // FindAllLocation implements entity.LocationDataInterface.
-func (u *userRepository) FindAllLocation() ([]entity.Main, error) {
+func (u *locationRepository) FindAllLocation() ([]entity.Main, error) {
 	var location []model.Location
 
 	err := u.db.Find(&location).Error
@@ -67,25 +67,25 @@ func (u *userRepository) FindAllLocation() ([]entity.Main, error) {
 		return nil, err
 	}
 
-	var allUser []entity.Main = model.ModelToMainMapping(location)
+	var alllocation []entity.Main = model.ModelToMainMapping(location)
 
-	return allUser, nil
+	return alllocation, nil
 }
 
 // GetById implements entity.LocationDataInterface.
-func (u *userRepository) GetById(id string) (entity.Main, error) {
+func (u *locationRepository) GetById(id string) (entity.Main, error) {
 	var locationData model.Location
 	result := u.db.Where("id = ?", id).First(&locationData)
 	if result.Error != nil {
 		return entity.Main{}, result.Error
 	}
 
-	var userById = model.MapModelToMain(locationData)
-	return userById, nil
+	var locationById = model.MapModelToMain(locationData)
+	return locationById, nil
 }
 
 // GetByCity implements entity.LocationDataInterface.
-func (u *userRepository) GetByCity(city string) ([]entity.Main, error) {
+func (u *locationRepository) GetByCity(city string) ([]entity.Main, error) {
 	var locationData []model.Location
     result := u.db.Where("city = ?", city).Find(&locationData)
     if result.Error != nil {
@@ -98,7 +98,7 @@ func (u *userRepository) GetByCity(city string) ([]entity.Main, error) {
 }
 
 // UpdateById implements entity.LocationDataInterface.
-func (u *userRepository) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
+func (u *locationRepository) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
 	uuidID, err := uuid.Parse(id)
 	if err != nil {
 		return entity.Main{}, err
