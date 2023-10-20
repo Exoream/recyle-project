@@ -52,7 +52,7 @@ func (uco *PickupController) CreatePickup(c echo.Context) error {
 			if strings.Contains(errCreate.Error(), "validation") {
 				return c.JSON(http.StatusBadRequest, helper.ErrorResponse(errCreate.Error()))
 			} else {
-				return c.JSON(http.StatusBadRequest, helper.ErrorResponse("failed to create data"))
+				return c.JSON(http.StatusBadRequest, helper.ErrorResponse("failed to create data: " + errCreate.Error()))
 			}
 		}
 
