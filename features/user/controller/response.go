@@ -1,10 +1,12 @@
 package controller
 
 import (
-	"recycle/features/user/entity"
+	// "recycle/features/pickup/controller"
+	"recycle/features/pickup/controller"
+	user "recycle/features/user/entity"
+	// pickup "recycle/features/pickup/entity"
 	"time"
 )
-
 
 type UserLoginResponse struct {
 	Id    string `json:"id"`
@@ -21,10 +23,12 @@ type UserResponse struct {
 	Address     string    `json:"address"`
 	SaldoPoints int       `json:"saldo_points"`
 	CreatedAt   time.Time `json:"created_at"`
+	Pickup      []controller.PickupRespon `json:"pickup"`
 }
 
-func MainResponse(dataMain entity.Main) UserResponse {
-	return UserResponse{
+func MainResponse(dataMain user.Main) UserResponse {
+	// Implementasi MainResponse sesuai dengan UserResponse
+	userResponse := UserResponse{
 		Id:          dataMain.Id,
 		Name:        dataMain.Name,
 		Email:       dataMain.Email,
@@ -33,15 +37,18 @@ func MainResponse(dataMain entity.Main) UserResponse {
 		Address:     dataMain.Address,
 		SaldoPoints: dataMain.SaldoPoints,
 		CreatedAt:   dataMain.CreatedAt,
+		Pickup:      []controller.PickupRespon{},
 	}
+
+	userResponse.Pickup = controller.MapModelToController(dataMain.Pickups)
+
+	return userResponse
 }
 
 func LoginResponse(id, email, token string) UserLoginResponse {
-    return UserLoginResponse{
-        Id:    id,
-        Email: email,
-        Token: token,
-    }
+	return UserLoginResponse{
+		Id:    id,
+		Email: email,
+		Token: token,
+	}
 }
-
-

@@ -1,13 +1,14 @@
 package model
 
 import (
+	"recycle/features/pickup/model"
 	"time"
 
 	"gorm.io/gorm"
 )
 
 type User struct {
-	ID          string         `gorm:"type:varchar(100);primaryKey;not null" json:"id"`
+	Id          string         `gorm:"type:varchar(100);primaryKey;not null" json:"id"`
 	Name        string         `gorm:"varchar(255);not null" json:"name"`
 	Email       string         `gorm:"varchar(255);unique;not null" json:"email"`
 	Password    string         `gorm:"varchar(255);not null" json:"password"`
@@ -19,4 +20,5 @@ type User struct {
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
+	Pickups     []model.Pickup 
 }
