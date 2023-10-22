@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"mime/multipart"
 	"recycle/features/pickup/entity"
 	"regexp"
 
@@ -21,7 +22,7 @@ func NewPickupUsecase(pickupRepo entity.PickupDataInterface) entity.UseCaseInter
 }
 
 // Create implements entity.UseCaseInterface.
-func (uc *pickupUseCase) Create(data entity.Main) error {
+func (uc *pickupUseCase) Create(data entity.Main, image *multipart.FileHeader) error {
 	errValidate := uc.validate.Struct(data)
 	if errValidate != nil {
 		return errValidate
@@ -35,7 +36,12 @@ func (uc *pickupUseCase) Create(data entity.Main) error {
 		return errors.New("PickupDate should be in the format YYYY-MM-DD")
 	}
 
-	err := uc.pickupRepo.Create(data)
+	// Memeriksa ukuran file tidak lebih dari 10 MB (10 * 1024 * 1024 byte)
+    if image.Size > 10*1024*1024 {
+        return errors.New("image file size should be less than 10 MB")
+    }
+
+	err := uc.pickupRepo.Create(data, image)
 	if err != nil {
 		return err
 	}
@@ -67,12 +73,16 @@ func (uc *pickupUseCase) DeleteById(id string) error {
 }
 
 // UpdateById implements entity.UseCaseInterface.
-func (uc *pickupUseCase) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
+func (uc *pickupUseCase) UpdateById(id string, updated entity.Main, image *multipart.FileHeader) (data entity.Main, err error) {
 	if id == "" {
 		return entity.Main{}, errors.New("id not found")
 	}
 
-	data, err = uc.pickupRepo.UpdateById(id, updated)
+	if image != nil && image.Size > 10*1024*1024 {
+        return entity.Main{}, errors.New("image file size should be less than 10 MB")
+    }
+
+	data, err = uc.pickupRepo.UpdateById(id, updated, image)
 	if err != nil {
 		return entity.Main{}, err
 	}

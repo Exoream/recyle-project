@@ -47,12 +47,17 @@ func (uco *PickupController) CreatePickup(c echo.Context) error {
 
 	// Periksa apakah pengguna adalah "user" dan ID yang login sesuai dengan ID yang dikirim dalam permintaan
 	if role == "user" && data.UserId == idToken.String() {
-		errCreate := uco.pickupUseCase.Create(data)
+		image, err := c.FormFile("image_url")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error uploading image"+err.Error()))
+		}
+
+		errCreate := uco.pickupUseCase.Create(data, image)
 		if errCreate != nil {
 			if strings.Contains(errCreate.Error(), "validation") {
 				return c.JSON(http.StatusBadRequest, helper.ErrorResponse(errCreate.Error()))
 			} else {
-				return c.JSON(http.StatusBadRequest, helper.ErrorResponse("failed to create data: "+errCreate.Error()))
+				return c.JSON(http.StatusBadRequest, helper.ErrorResponse("failed to create data:"+errCreate.Error()))
 			}
 		}
 
@@ -101,7 +106,12 @@ func (uco *PickupController) UpdatePickup(c echo.Context) error {
 			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error bind data"))
 		}
 
-		data, err := uco.pickupUseCase.UpdateById(idParam.String(), RequestMain(pickupReq))
+		image, err := c.FormFile("image_url")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error uploading image"+ err.Error()))
+		}
+
+		data, err := uco.pickupUseCase.UpdateById(idParam.String(), RequestMain(pickupReq), image)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 		}

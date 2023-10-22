@@ -2,8 +2,10 @@ package repository
 
 import (
 	"errors"
+	"mime/multipart"
 	"recycle/features/pickup/entity"
 	"recycle/features/pickup/model"
+	"recycle/keys"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -20,7 +22,7 @@ func NewPickupRepository(db *gorm.DB) entity.PickupDataInterface {
 }
 
 // Create implements entity.PickupDataInterface.
-func (u *pickupRepository) Create(data entity.Main) error {
+func (u *pickupRepository) Create(data entity.Main, image *multipart.FileHeader) error {
 	newUUID, err := uuid.NewRandom()
 	if err != nil {
 		return err
@@ -28,6 +30,13 @@ func (u *pickupRepository) Create(data entity.Main) error {
 
 	dataInput := model.MapMainToModel(data)
 	dataInput.Id = newUUID.String()
+
+	imageURL, err := keys.UploadImageToGoogleStorage(image)
+	if err != nil {
+		return err
+	}
+
+	dataInput.ImageURL = imageURL
 
 	tx := u.db.Create(&dataInput)
 	if tx.Error != nil {
@@ -59,7 +68,7 @@ func (u *pickupRepository) DeleteById(id string) error {
 }
 
 // UpdateById implements entity.PickupDataInterface.
-func (u *pickupRepository) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
+func (u *pickupRepository) UpdateById(id string, updated entity.Main, image *multipart.FileHeader) (data entity.Main, err error) {
 	uuidID, err := uuid.Parse(id)
 	if err != nil {
 		return entity.Main{}, err
@@ -70,6 +79,12 @@ func (u *pickupRepository) UpdateById(id string, updated entity.Main) (data enti
 	if resultFind.Error != nil {
 		return entity.Main{}, resultFind.Error
 	}
+
+	imageURL, uploadErr := keys.UploadImageToGoogleStorage(image)
+	if uploadErr != nil {
+		return entity.Main{}, uploadErr
+	}
+	updated.ImageURL = imageURL
 
 	u.db.Model(&pickupData).Updates(model.MapMainToModel(updated))
 
@@ -106,12 +121,21 @@ func (u *pickupRepository) FindAllPickup() ([]entity.Main, error) {
 // GetByStatus implements entity.PickupDataInterface.
 func (u *pickupRepository) GetByStatus(status string) ([]entity.Main, error) {
 	var pickupData []model.Pickup
-    result := u.db.Where("status = ?", status).Find(&pickupData)
-    if result.Error != nil {
-        return nil, result.Error
-    }
+	result := u.db.Where("status = ?", status).Find(&pickupData)
+	if result.Error != nil {
+		return nil, result.Error
+	}
 
-    var pickup []entity.Main
+	var pickup []entity.Main
 	pickup = model.ModelToMainMapping(pickupData)
-    return pickup, nil
+	return pickup, nil
+}
+
+// UpdateStatus implements entity.PickupDataInterface.
+func (u *pickupRepository) UpdateStatus(pickupID string, newStatus string) error {
+	var pickup model.Pickup
+    if err := u.db.Model(&pickup).Where("id = ?", pickupID).Update("status", newStatus).Error; err != nil {
+        return err
+    }
+    return nil
 }

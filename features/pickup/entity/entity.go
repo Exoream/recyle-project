@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	"mime/multipart"
+	"time"
+)
 
 type Main struct {
 	Id         string
@@ -10,24 +13,26 @@ type Main struct {
 	PickupDate string `validate:"required"`
 	Status     string
 	UserId     string
-	LocationId string
+	LocationId string `validate:"required"`
+	ImageURL   string `validate:"required"`
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  *time.Time
 }
 
 type PickupDataInterface interface {
-	Create(data Main) error
-	UpdateById(id string, updated Main) (data Main, err error)
+	Create(data Main, image *multipart.FileHeader) error
+	UpdateById(id string, updated Main, image *multipart.FileHeader) (data Main, err error)
 	DeleteById(id string) error
 	GetById(id string) (Main, error)
 	FindAllPickup() ([]Main, error)
 	GetByStatus(status string) ([]Main, error)
+	UpdateStatus(pickupID, newStatus string) error
 }
 
 type UseCaseInterface interface {
-	Create(data Main) error
-	UpdateById(id string, updated Main) (data Main, err error)
+	Create(data Main, image *multipart.FileHeader) error
+	UpdateById(id string, updated Main, image *multipart.FileHeader) (data Main, err error)
 	DeleteById(id string) error
 	GetById(id string) (Main, error)
 	FindAllPickup() ([]Main, error)
