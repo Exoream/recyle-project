@@ -63,7 +63,7 @@ func (uc *detailPickupUseCase) Create(data []entity.Main) error {
 
 		// Mendapatkan status pickup
 		if pickup.Status == "done" {
-			return fmt.Errorf("Cannot create detail pickup for a pickup with 'done' status")
+			return fmt.Errorf("cannot create detail pickup for a pickup with 'done' status")
 		}
 
 		// Hitung total poin berdasarkan itemWeight dan pointPerKg
@@ -86,7 +86,7 @@ func (uc *detailPickupUseCase) Create(data []entity.Main) error {
 	log.Println(totalUserPoints)
 	// Update status pickup hanya sekali setelah semua detail pickup berhasil dibuat
 	for _, pickupID := range pickupIDs {
-		_, errUpdateStatus := uc.pickupRepo.UpdateById(pickupID, pickup.Main{Status: "done"})
+		errUpdateStatus := uc.pickupRepo.UpdateStatus(pickupID, "done")
 		if errUpdateStatus != nil {
 			return errUpdateStatus
 		}

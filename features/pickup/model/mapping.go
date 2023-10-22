@@ -12,6 +12,7 @@ func MapMainToModel(mainData entity.Main) Pickup {
 		Status:     mainData.Status,
 		UserId:     mainData.UserId,
 		LocationId: mainData.LocationId,
+		ImageURL:   mainData.ImageURL,
 	}
 }
 
@@ -26,6 +27,7 @@ func MapModelToMain(mainData Pickup) entity.Main {
 		Status:     mainData.Status,
 		UserId:     mainData.UserId,
 		LocationId: mainData.LocationId,
+		ImageURL:   mainData.ImageURL,
 		CreatedAt:  mainData.CreatedAt,
 		UpdatedAt:  mainData.UpdatedAt,
 	}

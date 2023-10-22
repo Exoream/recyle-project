@@ -9,6 +9,7 @@ type PickupRespon struct {
 	Latitude   string `json:"latitude"`
 	PickupDate string `json:"pickup_date"`
 	LocationId string `json:"location_id"`
+	ImageURL   string `json:"image_url"`
 	Status     string `json:"status"`
 }
 
@@ -20,6 +21,7 @@ type PickupResponForGetAll struct {
 	PickupDate string `json:"pickup_date"`
 	UserId     string `json:"user_id"`
 	LocationId string `json:"location_id"`
+	ImageURL   string `json:"image_url"`
 	Status     string `json:"status"`
 }
 
@@ -31,6 +33,7 @@ func MainResponse(dataMain entity.Main) PickupRespon {
 		Latitude:   dataMain.Latitude,
 		PickupDate: dataMain.PickupDate,
 		LocationId: dataMain.LocationId,
+		ImageURL:   dataMain.ImageURL,
 		Status:     dataMain.Status,
 	}
 }
@@ -53,6 +56,7 @@ func MainResponses(dataMain entity.Main) PickupResponForGetAll {
 		PickupDate: dataMain.PickupDate,
 		UserId:     dataMain.UserId,
 		LocationId: dataMain.LocationId,
+		ImageURL:   dataMain.ImageURL,
 		Status:     dataMain.Status,
 	}
 }
