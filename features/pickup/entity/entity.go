@@ -14,7 +14,7 @@ type Main struct {
 	Status     string
 	UserId     string
 	LocationId string `validate:"required"`
-	ImageURL   string `validate:"required"`
+	ImageURL   string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  *time.Time
