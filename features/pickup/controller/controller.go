@@ -168,11 +168,7 @@ func (uco *PickupController) GetAllPickup(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("error get data"))
 	}
 
-	PickupGetAllData := make([]PickupResponForGetAll, 0)
-	for _, value := range responseData {
-		pickupResponse := MainResponses(value)
-		PickupGetAllData = append(PickupGetAllData, pickupResponse)
-	}
+	PickupGetAllData := MapModelsToController(responseData)
 
 	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success get all pickup", PickupGetAllData))
 	} else {

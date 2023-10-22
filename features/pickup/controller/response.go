@@ -56,3 +56,12 @@ func MainResponses(dataMain entity.Main) PickupResponForGetAll {
 		Status:     dataMain.Status,
 	}
 }
+
+func MapModelsToController(pickups []entity.Main) []PickupResponForGetAll {
+	PickupGetAllData := make([]PickupResponForGetAll, 0)
+	for _, value := range pickups {
+		pickupResponse := MainResponses(value)
+		PickupGetAllData = append(PickupGetAllData, pickupResponse)
+	}
+	return PickupGetAllData
+}
