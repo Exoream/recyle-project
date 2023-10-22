@@ -4,6 +4,7 @@ import (
 	// "recycle/features/pickup/controller"
 	"recycle/features/pickup/controller"
 	user "recycle/features/user/entity"
+
 	// pickup "recycle/features/pickup/entity"
 	"time"
 )
@@ -15,14 +16,14 @@ type UserLoginResponse struct {
 }
 
 type UserResponse struct {
-	Id          string    `json:"id"`
-	Name        string    `json:"name"`
-	Email       string    `json:"email"`
-	Gender      string    `json:"gender"`
-	Age         int       `json:"age"`
-	Address     string    `json:"address"`
-	SaldoPoints int       `json:"saldo_points"`
-	CreatedAt   time.Time `json:"created_at"`
+	Id          string                    `json:"id"`
+	Name        string                    `json:"name"`
+	Email       string                    `json:"email"`
+	Gender      string                    `json:"gender"`
+	Age         int                       `json:"age"`
+	Address     string                    `json:"address"`
+	SaldoPoints float64                   `json:"saldo_points"`
+	CreatedAt   time.Time                 `json:"created_at"`
 	Pickup      []controller.PickupRespon `json:"pickup"`
 }
 

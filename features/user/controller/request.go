@@ -10,7 +10,7 @@ type UserRequest struct {
 	Gender      string `json:"gender"`
 	Age         int    `json:"age"`
 	Address     string `json:"address"`
-	SaldoPoints int    `json:"saldo_points"`
+	SaldoPoints float64    `json:"saldo_points"`
 }
 
 type UserLogin struct {
