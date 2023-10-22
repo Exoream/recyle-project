@@ -13,7 +13,7 @@ type Main struct {
 	Gender      string `validate:"oneof=Man Woman"`
 	Age         int
 	Address     string
-	SaldoPoints int
+	SaldoPoints float64
 	Role        string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
