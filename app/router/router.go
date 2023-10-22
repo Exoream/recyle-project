@@ -18,6 +18,10 @@ import (
 	pickupRepository "recycle/features/pickup/repository"
 	pickupUsecase "recycle/features/pickup/usecase"
 
+	detailPickupController "recycle/features/detail_pickup/controller"
+	detailPickupRepository "recycle/features/detail_pickup/repository"
+	detailPickupUsecase "recycle/features/detail_pickup/usecase"
+
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -42,6 +46,11 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	pickupRepository := pickupRepository.NewPickupRepository(db)
 	pickupUsecase := pickupUsecase.NewPickupUsecase(pickupRepository)
 	pickupController := pickupController.NewPickupControllers(pickupUsecase)
+
+	// Detail Pickup
+	detailPickupRepository := detailPickupRepository.NewDetailPickupRepository(db)
+	detailPickupUsecase := detailPickupUsecase.NewDetailPickupUsecase(detailPickupRepository, rubbishRepository, pickupRepository, userRepository)
+	detailPickupController := detailPickupController.NewPickupControllers(detailPickupUsecase)
 
 	// User & Admin CRUD
 	user := e.Group("/users") 
@@ -73,4 +82,8 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	pickup.PUT("/:id", pickupController.UpdatePickup, middlewares.JWTMiddleware())
 	pickup.DELETE("/:id", pickupController.DeletePickup, middlewares.JWTMiddleware())
 	pickup.GET("", pickupController.GetAllPickup, middlewares.JWTMiddleware())
+
+	detailPickup := e.Group("/detail/pickup")
+	detailPickup.POST("", detailPickupController.CreateDetailPickup, middlewares.JWTMiddleware())
+	detailPickup.GET("", detailPickupController.GetAllDetailPickup, middlewares.JWTMiddleware())
 }
