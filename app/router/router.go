@@ -82,6 +82,7 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	pickup.PUT("/:id", pickupController.UpdatePickup, middlewares.JWTMiddleware())
 	pickup.DELETE("/:id", pickupController.DeletePickup, middlewares.JWTMiddleware())
 	pickup.GET("", pickupController.GetAllPickup, middlewares.JWTMiddleware())
+	pickup.GET("/status", pickupController.GetDataByStatus, middlewares.JWTMiddleware())
 
 	detailPickup := e.Group("/detail/pickup")
 	detailPickup.POST("", detailPickupController.CreateDetailPickup, middlewares.JWTMiddleware())

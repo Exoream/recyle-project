@@ -22,6 +22,7 @@ type PickupDataInterface interface {
 	DeleteById(id string) error
 	GetById(id string) (Main, error)
 	FindAllPickup() ([]Main, error)
+	GetByStatus(status string) ([]Main, error)
 }
 
 type UseCaseInterface interface {
@@ -30,4 +31,5 @@ type UseCaseInterface interface {
 	DeleteById(id string) error
 	GetById(id string) (Main, error)
 	FindAllPickup() ([]Main, error)
+	GetByStatus(status string) ([]Main, error)
 }

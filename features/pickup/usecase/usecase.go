@@ -34,7 +34,7 @@ func (uc *pickupUseCase) Create(data entity.Main) error {
 	if !matched {
 		return errors.New("PickupDate should be in the format YYYY-MM-DD")
 	}
-	
+
 	err := uc.pickupRepo.Create(data)
 	if err != nil {
 		return err
@@ -101,4 +101,14 @@ func (uc *pickupUseCase) FindAllPickup() ([]entity.Main, error) {
 		return nil, err
 	}
 	return pickup, nil
+}
+
+// GetByStatus implements entity.UseCaseInterface.
+func (uc *pickupUseCase) GetByStatus(status string) ([]entity.Main, error) {
+	if status == "" {
+		return nil, errors.New("status parameter is required")
+	}
+
+	data, err := uc.pickupRepo.GetByStatus(status)
+	return data, err
 }
