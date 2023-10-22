@@ -102,3 +102,16 @@ func (u *pickupRepository) FindAllPickup() ([]entity.Main, error) {
 
 	return allPickup, nil
 }
+
+// GetByStatus implements entity.PickupDataInterface.
+func (u *pickupRepository) GetByStatus(status string) ([]entity.Main, error) {
+	var pickupData []model.Pickup
+    result := u.db.Where("status = ?", status).Find(&pickupData)
+    if result.Error != nil {
+        return nil, result.Error
+    }
+
+    var pickup []entity.Main
+	pickup = model.ModelToMainMapping(pickupData)
+    return pickup, nil
+}

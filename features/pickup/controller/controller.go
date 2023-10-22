@@ -52,7 +52,7 @@ func (uco *PickupController) CreatePickup(c echo.Context) error {
 			if strings.Contains(errCreate.Error(), "validation") {
 				return c.JSON(http.StatusBadRequest, helper.ErrorResponse(errCreate.Error()))
 			} else {
-				return c.JSON(http.StatusBadRequest, helper.ErrorResponse("failed to create data: " + errCreate.Error()))
+				return c.JSON(http.StatusBadRequest, helper.ErrorResponse("failed to create data: "+errCreate.Error()))
 			}
 		}
 
@@ -62,7 +62,6 @@ func (uco *PickupController) CreatePickup(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
 	}
 }
-
 
 func (uco *PickupController) UpdatePickup(c echo.Context) error {
 	// Mendapatkan role pengguna dari token
@@ -115,24 +114,24 @@ func (uco *PickupController) UpdatePickup(c echo.Context) error {
 }
 
 func (uco *PickupController) DeletePickup(c echo.Context) error {
-    // Mendapatkan role pengguna dari token
-    role, err := middlewares.ExtractRole(c)
-    if err != nil {
-        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting role"))
-    }
+	// Mendapatkan role pengguna dari token
+	role, err := middlewares.ExtractRole(c)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting role"))
+	}
 
-    // Periksa apakah pengguna adalah user.
-    if role == "user" {
+	// Periksa apakah pengguna adalah user.
+	if role == "user" {
 		userID := middlewares.ExtractToken(c)
 		if userID == uuid.Nil {
 			return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
 		}
 
-        idParamStr := c.Param("id")
-        idParam, errId := uuid.Parse(idParamStr)
-        if errId != nil {
-            return c.JSON(http.StatusBadRequest, helper.ErrorResponse("invalid UUID format"))
-        }
+		idParamStr := c.Param("id")
+		idParam, errId := uuid.Parse(idParamStr)
+		if errId != nil {
+			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("invalid UUID format"))
+		}
 
 		pickup, errData := uco.pickupUseCase.GetById(idParam.String())
 		if errData != nil {
@@ -144,35 +143,61 @@ func (uco *PickupController) DeletePickup(c echo.Context) error {
 			return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
 		}
 
-        err := uco.pickupUseCase.DeleteById(idParam.String())
-        if err != nil {
-            return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
-        }
-        return c.JSON(http.StatusOK, helper.SuccesResponses("success delete pickup"))
-    } else {
-        // Jika bukan user, kembalikan pesan "unauthorized".
-        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
-    }
+		err := uco.pickupUseCase.DeleteById(idParam.String())
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
+		}
+		return c.JSON(http.StatusOK, helper.SuccesResponses("success delete pickup"))
+	} else {
+		// Jika bukan user, kembalikan pesan "unauthorized".
+		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
+	}
 }
 
 func (uco *PickupController) GetAllPickup(c echo.Context) error {
-    role, err := middlewares.ExtractRole(c)
-    if err != nil {
-        return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting role"))
-    }
-
-	if role == "admin" {
-	// memanggil function dari usecase
-	responseData, err := uco.pickupUseCase.FindAllPickup()
+	role, err := middlewares.ExtractRole(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("error get data"))
+		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting role"))
 	}
 
-	PickupGetAllData := MapModelsToController(responseData)
+	if role == "admin" {
+		// memanggil function dari usecase
+		responseData, err := uco.pickupUseCase.FindAllPickup()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("error get data"))
+		}
 
-	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success get all pickup", PickupGetAllData))
+		PickupGetAllData := MapModelsToController(responseData)
+
+		return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success get all pickup", PickupGetAllData))
 	} else {
 		// Jika bukan admin, kembalikan pesan "unauthorized".
+		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
+	}
+}
+
+func (uco *PickupController) GetDataByStatus(c echo.Context) error {
+	role, err := middlewares.ExtractRole(c)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("error extracting role"))
+	}
+
+	if role == "admin" {
+		status := c.QueryParam("status")
+		result, err := uco.pickupUseCase.GetByStatus(status)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("error reading data"))
+		}
+
+		var statusResponse []PickupResponForGetAll
+
+		// Konversi setiap lokasi ke MainResponse
+		for _, value := range result {
+			statusResponse = append(statusResponse, MainResponses(value))
+		}
+
+		return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success get data", statusResponse))
+	} else {
 		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("unauthorized"))
 	}
 }
