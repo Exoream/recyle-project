@@ -5,11 +5,12 @@ import (
 )
 
 type RubbishRespon struct {
-	Id          string    `json:"id"`
-	Name        string    `json:"name"`
-	TypeRubbish string    `json:"type_rubbish"`
-	PointPerKg  int       `json:"point_per_kg"`
-	Description string    `json:"description"`
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	TypeRubbish string `json:"type_rubbish"`
+	PointPerKg  int    `json:"point_per_kg"`
+	Description string `json:"description"`
+	ImageURL    string `json:"image_url"`
 }
 
 func MainResponse(dataMain entity.Main) RubbishRespon {
@@ -19,5 +20,6 @@ func MainResponse(dataMain entity.Main) RubbishRespon {
 		TypeRubbish: dataMain.TypeRubbish,
 		PointPerKg:  dataMain.PointPerKg,
 		Description: dataMain.Description,
+		ImageURL:    dataMain.ImageURL,
 	}
 }

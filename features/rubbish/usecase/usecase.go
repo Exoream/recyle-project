@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"mime/multipart"
 	"recycle/features/rubbish/entity"
 
 	"github.com/go-playground/validator/v10"
@@ -20,13 +21,17 @@ func NewRubbishUsecase(rubbishRepo entity.RubbishDataInterface) entity.UseCaseIn
 }
 
 // Create implements rubbish.UseCaseInterface.
-func (uc *rubbishUseCase) Create(data entity.Main) error {
+func (uc *rubbishUseCase) Create(data entity.Main, image *multipart.FileHeader) error {
 	errValidate := uc.validate.Struct(data)
 	if errValidate != nil {
 		return errValidate
 	}
 
-	err := uc.rubbishRepo.Create(data)
+	if image.Size > 10*1024*1024 {
+		return errors.New("image file size should be less than 10 MB")
+	}
+
+	err := uc.rubbishRepo.Create(data, image)
 	if err != nil {
 		return err
 	}
@@ -68,12 +73,16 @@ func (uc *rubbishUseCase) GetById(id string) (entity.Main, error) {
 }
 
 // UpdateById implements rubbish.UseCaseInterface.
-func (uc *rubbishUseCase) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
+func (uc *rubbishUseCase) UpdateById(id string, updated entity.Main, image *multipart.FileHeader) (data entity.Main, err error) {
 	if id == "" {
 		return entity.Main{}, errors.New("id not found")
 	}
 
-	data, err = uc.rubbishRepo.UpdateById(id, updated)
+	if image != nil && image.Size > 10*1024*1024 {
+		return entity.Main{}, errors.New("image file size should be less than 10 MB")
+	}
+
+	data, err = uc.rubbishRepo.UpdateById(id, updated, image)
 	if err != nil {
 		return entity.Main{}, err
 	}

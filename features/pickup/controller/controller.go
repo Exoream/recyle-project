@@ -105,13 +105,14 @@ func (uco *PickupController) UpdatePickup(c echo.Context) error {
 		if errBind != nil {
 			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error bind data"))
 		}
+		pickupMain := RequestMain(pickupReq)
 
 		image, err := c.FormFile("image_url")
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error uploading image"+ err.Error()))
 		}
 
-		data, err := uco.pickupUseCase.UpdateById(idParam.String(), RequestMain(pickupReq), image)
+		data, err := uco.pickupUseCase.UpdateById(idParam.String(), pickupMain, image)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 		}

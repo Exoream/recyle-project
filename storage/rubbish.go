@@ -1,4 +1,4 @@
-package keys
+package storage
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-func UploadImageToGoogleStorage(image *multipart.FileHeader) (string, error) {
+func UploadImageForRubbish(image *multipart.FileHeader) (string, error) {
 	err := godotenv.Load(".env")
 
 	if err != nil {
@@ -22,7 +22,7 @@ func UploadImageToGoogleStorage(image *multipart.FileHeader) (string, error) {
 
 	ctx := context.Background()
 
-	// Gantilah credentialFile dengan path ke credential file JSON Anda
+	// keys credentials google cloud
 	credentialFile := os.Getenv("GOOGLE_CLOUD_CREDENTIALS_PATH")
 	client, err := storage.NewClient(ctx, option.WithCredentialsFile(credentialFile))
 	if err != nil {
@@ -30,9 +30,9 @@ func UploadImageToGoogleStorage(image *multipart.FileHeader) (string, error) {
 	}
 	defer client.Close()
 
-	// Gantilah bucketName sesuai dengan nama bucket Google Cloud Storage Anda
+
 	bucketName := "garvice"
-	imagePath := "file_pickup/" + uuid.New().String() + ".jpg"
+	imagePath := "file_rubbish/" + uuid.New().String() + ".jpg"
 
 	wc := client.Bucket(bucketName).Object(imagePath).NewWriter(ctx)
 	defer wc.Close()
@@ -48,3 +48,4 @@ func UploadImageToGoogleStorage(image *multipart.FileHeader) (string, error) {
 
 	return imageURL, nil
 }
+
