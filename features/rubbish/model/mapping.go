@@ -9,6 +9,7 @@ func MapMainToModel(mainData entity.Main) Rubbish {
 		TypeRubbish: mainData.TypeRubbish,
 		PointPerKg:  mainData.PointPerKg,
 		Description: mainData.Description,
+		ImageURL:    mainData.ImageURL,
 	}
 }
 
@@ -20,6 +21,7 @@ func MapModelToMain(mainData Rubbish) entity.Main {
 		TypeRubbish: mainData.TypeRubbish,
 		PointPerKg:  mainData.PointPerKg,
 		Description: mainData.Description,
+		ImageURL:    mainData.ImageURL,
 		CreatedAt:   mainData.CreatedAt,
 		UpdatedAt:   mainData.UpdatedAt,
 	}

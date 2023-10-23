@@ -5,7 +5,7 @@ import (
 	"mime/multipart"
 	"recycle/features/pickup/entity"
 	"recycle/features/pickup/model"
-	"recycle/keys"
+	"recycle/storage"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -31,7 +31,7 @@ func (u *pickupRepository) Create(data entity.Main, image *multipart.FileHeader)
 	dataInput := model.MapMainToModel(data)
 	dataInput.Id = newUUID.String()
 
-	imageURL, err := keys.UploadImageToGoogleStorage(image)
+	imageURL, err := storage.UploadImageForPickup(image)
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func (u *pickupRepository) UpdateById(id string, updated entity.Main, image *mul
 		return entity.Main{}, resultFind.Error
 	}
 
-	imageURL, uploadErr := keys.UploadImageToGoogleStorage(image)
+	imageURL, uploadErr := storage.UploadImageForPickup(image)
 	if uploadErr != nil {
 		return entity.Main{}, uploadErr
 	}
@@ -134,8 +134,8 @@ func (u *pickupRepository) GetByStatus(status string) ([]entity.Main, error) {
 // UpdateStatus implements entity.PickupDataInterface.
 func (u *pickupRepository) UpdateStatus(pickupID string, newStatus string) error {
 	var pickup model.Pickup
-    if err := u.db.Model(&pickup).Where("id = ?", pickupID).Update("status", newStatus).Error; err != nil {
-        return err
-    }
-    return nil
+	if err := u.db.Model(&pickup).Where("id = ?", pickupID).Update("status", newStatus).Error; err != nil {
+		return err
+	}
+	return nil
 }

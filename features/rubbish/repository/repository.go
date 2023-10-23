@@ -2,8 +2,10 @@ package repository
 
 import (
 	"errors"
+	"mime/multipart"
 	"recycle/features/rubbish/entity"
 	"recycle/features/rubbish/model"
+	"recycle/storage"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -20,7 +22,7 @@ func NewRubbishRepository(db *gorm.DB) entity.RubbishDataInterface {
 }
 
 // Create implements rubbish.RubbishDataInterface.
-func (u *rubbishRepository) Create(data entity.Main) error {
+func (u *rubbishRepository) Create(data entity.Main, image *multipart.FileHeader) error {
 	newUUID, err := uuid.NewRandom()
 	if err != nil {
 		return err
@@ -28,6 +30,13 @@ func (u *rubbishRepository) Create(data entity.Main) error {
 
 	dataInput := model.MapMainToModel(data)
 	dataInput.Id = newUUID.String()
+
+	imageURL, err := storage.UploadImageForRubbish(image)
+	if err != nil {
+		return err
+	}
+
+	dataInput.ImageURL = imageURL
 
 	tx := u.db.Create(&dataInput)
 	if tx.Error != nil {
@@ -85,7 +94,7 @@ func (u *rubbishRepository) GetById(id string) (entity.Main, error) {
 }
 
 // UpdateById implements rubbish.RubbishDataInterface.
-func (u *rubbishRepository) UpdateById(id string, updated entity.Main) (data entity.Main, err error) {
+func (u *rubbishRepository) UpdateById(id string, updated entity.Main, image *multipart.FileHeader) (data entity.Main, err error) {
 	uuidID, err := uuid.Parse(id)
 	if err != nil {
 		return entity.Main{}, err
@@ -97,6 +106,12 @@ func (u *rubbishRepository) UpdateById(id string, updated entity.Main) (data ent
 		return entity.Main{}, resultFind.Error
 	}
 
+	imageURL, uploadErr := storage.UploadImageForRubbish(image)
+	if uploadErr != nil {
+		return entity.Main{}, uploadErr
+	}
+	updated.ImageURL = imageURL
+
 	u.db.Model(&rubbishData).Updates(model.MapMainToModel(updated))
 
 	data = model.MapModelToMain(rubbishData)
@@ -106,12 +121,12 @@ func (u *rubbishRepository) UpdateById(id string, updated entity.Main) (data ent
 // GetByType implements entity.RubbishDataInterface.
 func (u *rubbishRepository) GetByType(typeRubbish string) ([]entity.Main, error) {
 	var typeData []model.Rubbish
-    result := u.db.Where("type_rubbish = ?", typeRubbish).Find(&typeData)
-    if result.Error != nil {
-        return nil, result.Error
-    }
+	result := u.db.Where("type_rubbish = ?", typeRubbish).Find(&typeData)
+	if result.Error != nil {
+		return nil, result.Error
+	}
 
-    var rubbish []entity.Main
+	var rubbish []entity.Main
 	rubbish = model.ModelToMainMapping(typeData)
-    return rubbish, nil
+	return rubbish, nil
 }

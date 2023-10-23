@@ -39,7 +39,12 @@ func (uco *RubbishController) CreateRubbish(c echo.Context) error {
 
         data := RequestMain(dataInput)
 
-        errCreate := uco.rubbishUseCase.Create(data)
+        image, err := c.FormFile("image_url")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error uploading image"+err.Error()))
+		}
+
+        errCreate := uco.rubbishUseCase.Create(data, image)
         if errCreate != nil {
             if strings.Contains(errCreate.Error(), "validation") {
                 return c.JSON(http.StatusBadRequest, helper.ErrorResponse(errCreate.Error()))
@@ -102,7 +107,13 @@ func (uco *RubbishController) UpdateRubbish(c echo.Context) error {
         }
 
         userMain := RequestMain(rubbishReq)
-        data, err := uco.rubbishUseCase.UpdateById(idParam.String(), userMain)
+
+        image, err := c.FormFile("image_url")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error uploading image"+ err.Error()))
+		}
+
+        data, err := uco.rubbishUseCase.UpdateById(idParam.String(), userMain, image)
         if err != nil {
             return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
         }
