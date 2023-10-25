@@ -87,6 +87,10 @@ func (uc *pickupUseCase) UpdateById(id string, updated entity.Main, image *multi
 		return entity.Main{}, err
 	}
 
+	if updated.ImageURL == "" {
+		updated.ImageURL = data.ImageURL
+	}
+
 	if data.Status == "done" {
 		return entity.Main{}, errors.New("pickup is already completed and cannot be updated or deleted")
 	}

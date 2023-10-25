@@ -60,6 +60,7 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	user.GET("/:id", userController.GetUser, middlewares.JWTMiddleware())
 	user.PUT("/:id", userController.Update, middlewares.JWTMiddleware())
 	user.DELETE("/:id", userController.Delete, middlewares.JWTMiddleware())
+	e.GET("/verify", userController.VerifyAccount)
 
 	rubbish := e.Group("/rubbish")
 	rubbish.POST("", rubbishController.CreateRubbish, middlewares.JWTMiddleware())

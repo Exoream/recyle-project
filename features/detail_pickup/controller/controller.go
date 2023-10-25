@@ -91,7 +91,7 @@ func (uco *DetailPickupController) CreateDetailPickup(c echo.Context) error {
 			TotalPoints: totalUserPoints,
 		}
 
-		emailTemplate, err := ioutil.ReadFile("email/template/recycling_info.html")
+		emailTemplate, err := ioutil.ReadFile("email/templates/recycling_info.html")
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("failed to read email template"))
 		}
