@@ -1,6 +1,7 @@
 package router
 
 import (
+	"os"
 	"recycle/app/middlewares"
 	userController "recycle/features/user/controller"
 	userRepository "recycle/features/user/repository"
@@ -22,6 +23,10 @@ import (
 	detailPickupRepository "recycle/features/detail_pickup/repository"
 	detailPickupUsecase "recycle/features/detail_pickup/usecase"
 
+	aiUsecase "recycle/features/ai/usecase"
+	aiController "recycle/features/ai/controller"
+
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -52,8 +57,16 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	detailPickupUsecase := detailPickupUsecase.NewDetailPickupUsecase(detailPickupRepository, rubbishRepository, pickupRepository, userRepository)
 	detailPickupController := detailPickupController.NewPickupControllers(detailPickupUsecase, pickupUsecase, userUsecase)
 
+	// AI
+	if err := godotenv.Load(); err != nil {
+		panic("Error loading .env file")
+	}
+	openaiKey := os.Getenv("OPENAI_API_KEY")
+	aiUsecase := aiUsecase.NewAIUsecase(nil, openaiKey)
+	aiController := aiController.NewRubbishController(aiUsecase)
+
 	// User & Admin CRUD
-	user := e.Group("/users") 
+	user := e.Group("/users")
 	user.POST("/register", userController.CreateUser)
 	user.POST("/login", userController.Login)
 	user.GET("", userController.GetAllUser, middlewares.JWTMiddleware())
@@ -88,4 +101,6 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	detailPickup := e.Group("/detail/pickup")
 	detailPickup.POST("", detailPickupController.CreateDetailPickup, middlewares.JWTMiddleware())
 	detailPickup.GET("", detailPickupController.GetAllDetailPickup, middlewares.JWTMiddleware())
+
+	e.POST("/type", aiController.GetRecyclableRecommendation)
 }
