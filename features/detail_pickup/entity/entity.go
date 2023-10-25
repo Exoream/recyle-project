@@ -24,6 +24,6 @@ type DetailPickupDataInterface interface {
 }
 
 type UseCaseInterface interface {
-	Create(data []Main) error
+	Create(data []Main) (int, error)
 	FindAllDetailPickup() ([]Main, error)
 }
