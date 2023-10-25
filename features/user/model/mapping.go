@@ -10,31 +10,35 @@ import (
 // Mapping dari Main ke Model
 func MapMainToModel(mainData entity.Main) User {
 	return User{
-		Name:        mainData.Name,
-		Email:       mainData.Email,
-		Password:    mainData.Password,
-		Gender:      mainData.Gender,
-		Age:         mainData.Age,
-		Address:     mainData.Address,
-		SaldoPoints: mainData.SaldoPoints,
-		Role:        mainData.Role,
+		Name:              mainData.Name,
+		Email:             mainData.Email,
+		Password:          mainData.Password,
+		Gender:            mainData.Gender,
+		Age:               mainData.Age,
+		Address:           mainData.Address,
+		SaldoPoints:       mainData.SaldoPoints,
+		Role:              mainData.Role,
+		IsVerified:        mainData.IsVerified,
+		VerificationToken: mainData.VerificationToken,
 	}
 }
 
 // Mapping dari Model ke Main
 func MapModelToMain(mainData User) entity.Main {
 	return entity.Main{
-		Id:          mainData.Id,
-		Name:        mainData.Name,
-		Email:       mainData.Email,
-		Password:    mainData.Password,
-		Gender:      mainData.Gender,
-		Age:         mainData.Age,
-		Address:     mainData.Address,
-		SaldoPoints: mainData.SaldoPoints,
-		Role:        mainData.Role,
-		CreatedAt:   mainData.CreatedAt,
-		UpdatedAt:   mainData.UpdatedAt,
+		Id:                mainData.Id,
+		Name:              mainData.Name,
+		Email:             mainData.Email,
+		Password:          mainData.Password,
+		Gender:            mainData.Gender,
+		Age:               mainData.Age,
+		Address:           mainData.Address,
+		SaldoPoints:       mainData.SaldoPoints,
+		Role:              mainData.Role,
+		IsVerified:        mainData.IsVerified,
+		VerificationToken: mainData.VerificationToken,
+		CreatedAt:         mainData.CreatedAt,
+		UpdatedAt:         mainData.UpdatedAt,
 	}
 }
 
@@ -55,4 +59,3 @@ func ModelToMainMapping(dataModel []User) []entity.Main {
 	}
 	return mainList
 }
-

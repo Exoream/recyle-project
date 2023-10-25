@@ -3,14 +3,14 @@ package controller
 import "recycle/features/user/entity"
 
 type UserRequest struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Email       string `json:"email"`
-	Password    string `json:"password"`
-	Gender      string `json:"gender"`
-	Age         int    `json:"age"`
-	Address     string `json:"address"`
-	SaldoPoints float64    `json:"saldo_points"`
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Email       string  `json:"email"`
+	Password    string  `json:"password"`
+	Gender      string  `json:"gender"`
+	Age         int     `json:"age"`
+	Address     string  `json:"address"`
+	SaldoPoints int `json:"saldo_points"`
 }
 
 type UserLogin struct {

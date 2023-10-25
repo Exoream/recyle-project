@@ -23,27 +23,27 @@ func NewUserUsecase(userRepo entity.UserDataInterface) entity.UseCaseInterface {
 }
 
 // Create implements user.UseCaseInterface.
-func (uc *userUseCase) Create(data entity.Main) error {
+func (uc *userUseCase) Create(data entity.Main) (string, error) {
 	errValidate := uc.validate.Struct(data)
 	if errValidate != nil {
-		return errValidate
+		return "", errValidate
 	}
 
 	hashedPassword, errHash := helper.HashPassword(data.Password)
 	if errHash != nil {
-		return errors.New("error hash password")
+		return "", errors.New("error hash password")
 	}
 
 	data.Password = hashedPassword
 	data.SaldoPoints = 0
 	data.Role = "user"
 
-	err := uc.userRepo.Create(data)
+	uniqueToken, err := uc.userRepo.Create(data)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return uniqueToken, nil
 }
 
 // CheckLogin implements user.UseCaseInterface.
@@ -71,8 +71,7 @@ func (uc *userUseCase) CheckLogin(email string, password string) (entity.Main, s
 
 		return dataLogin, token, nil
 	}
-
-	return entity.Main{}, "", errors.New("Login failed")
+	return entity.Main{}, "", errors.New("login failed")
 }
 
 // GetById implements user.UseCaseInterface.
@@ -128,4 +127,32 @@ func (uc *userUseCase) FindAllUsers() ([]entity.Main, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+// GetByVerificationToken implements entity.UseCaseInterface.
+func (uc *userUseCase) GetByVerificationToken(token string) (entity.Main, error) {
+	if token == "" {
+		return entity.Main{}, errors.New("invalid token")
+	}
+
+	idToken, err := uc.userRepo.GetByVerificationToken(token)
+	return idToken, err
+}
+
+// UpdateIsVerified implements entity.UseCaseInterface.
+func (uc *userUseCase) UpdateIsVerified(userID string, isVerified bool) error {
+	if userID == "" {
+		return errors.New("user ID is required")
+	}
+
+	return uc.userRepo.UpdateIsVerified(userID, isVerified)
+}
+
+// GetEmailByID implements entity.UseCaseInterface.
+func (uc *userUseCase) GetEmailByID(userID string) (string, error) {
+	userEmail, err := uc.userRepo.GetEmailByID(userID)
+	if err != nil {
+		return "", err
+	}
+	return userEmail, nil
 }

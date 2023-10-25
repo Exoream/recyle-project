@@ -50,7 +50,7 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	// Detail Pickup
 	detailPickupRepository := detailPickupRepository.NewDetailPickupRepository(db)
 	detailPickupUsecase := detailPickupUsecase.NewDetailPickupUsecase(detailPickupRepository, rubbishRepository, pickupRepository, userRepository)
-	detailPickupController := detailPickupController.NewPickupControllers(detailPickupUsecase)
+	detailPickupController := detailPickupController.NewPickupControllers(detailPickupUsecase, pickupUsecase, userUsecase)
 
 	// User & Admin CRUD
 	user := e.Group("/users") 

@@ -30,22 +30,22 @@ func NewDetailPickupUsecase(detailPickupRepo entity.DetailPickupDataInterface, r
 }
 
 // Create implements entity.UseCaseInterface.
-func (uc *detailPickupUseCase) Create(data []entity.Main) error {
+func (uc *detailPickupUseCase) Create(data []entity.Main) (int, error) {
 	for _, detail := range data {
 		errValidate := uc.validate.Struct(detail)
 		if errValidate != nil {
-			return errValidate
+			return 0, errValidate
 		}
 	}
 
 	// Mulai transaksi database
 	tx, err := uc.detailPickupRepo.BeginTransaction()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer tx.Rollback()
 
-	totalUserPoints := float64(0)
+	totalUserPoints := 0
 	// Simpan pickup IDs untuk perubahan status
 	pickupIDs := []string{}
 	pickupDataMap := make(map[string]pickup.Main)
@@ -56,29 +56,29 @@ func (uc *detailPickupUseCase) Create(data []entity.Main) error {
 		if !exists {
 			pickup, err := uc.pickupRepo.GetById(pickupID)
 			if err != nil {
-				return err
+				return 0, err
 			}
 			pickupDataMap[pickupID] = pickup
 		}
 
 		// Mendapatkan status pickup
 		if pickup.Status == "done" {
-			return fmt.Errorf("cannot create detail pickup for a pickup with 'done' status")
+			return 0, fmt.Errorf("cannot create detail pickup for a pickup with 'done' status")
 		}
 
 		// Hitung total poin berdasarkan itemWeight dan pointPerKg
 		rubbish, err := uc.rubbishRepo.GetById(detail.RubbishId)
 		if err != nil {
-			return err
+			return 0, err
 		}
 
 		detail.TotalPoints = detail.ItemWeight * float64(rubbish.PointPerKg)
-		totalUserPoints += detail.TotalPoints
+		totalUserPoints += int(detail.TotalPoints)
 		log.Println(detail.TotalPoints)
 		// Buat detail pickup di dalam transaksi
 		errCreate := uc.detailPickupRepo.Create([]entity.Main{detail})
 		if errCreate != nil {
-			return errCreate
+			return 0, errCreate
 		}
 
 		pickupIDs = append(pickupIDs, pickupID)
@@ -88,7 +88,7 @@ func (uc *detailPickupUseCase) Create(data []entity.Main) error {
 	for _, pickupID := range pickupIDs {
 		errUpdateStatus := uc.pickupRepo.UpdateStatus(pickupID, "done")
 		if errUpdateStatus != nil {
-			return errUpdateStatus
+			return 0, errUpdateStatus
 		}
 	}
 
@@ -98,7 +98,7 @@ func (uc *detailPickupUseCase) Create(data []entity.Main) error {
 		// Mengambil data pengguna
 		user, err := uc.userRepo.GetById(userId)
 		if err != nil {
-			return err
+			return 0, err
 		}
 
 		// Tambahkan total poin dari detail pickup ke saldo pengguna
@@ -106,16 +106,16 @@ func (uc *detailPickupUseCase) Create(data []entity.Main) error {
 
 		_, errUpdateUser := uc.userRepo.UpdateById(userId, user)
 		if errUpdateUser != nil {
-			return errUpdateUser
+			return 0, err
 		}
 	}
 
 	// Commit transaksi jika semuanya berhasil
 	if err := tx.Commit().Error; err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	return totalUserPoints, nil
 }
 
 
