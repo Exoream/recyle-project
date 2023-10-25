@@ -80,11 +80,13 @@ func (u *pickupRepository) UpdateById(id string, updated entity.Main, image *mul
 		return entity.Main{}, resultFind.Error
 	}
 
-	imageURL, uploadErr := storage.UploadImageForPickup(image)
-	if uploadErr != nil {
-		return entity.Main{}, uploadErr
+	if image != nil {
+		imageURL, uploadErr := storage.UploadImageForPickup(image)
+		if uploadErr != nil {
+			return entity.Main{}, uploadErr
+		}
+		updated.ImageURL = imageURL
 	}
-	updated.ImageURL = imageURL
 
 	u.db.Model(&pickupData).Updates(model.MapMainToModel(updated))
 

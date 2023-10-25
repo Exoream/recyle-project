@@ -10,7 +10,7 @@ type Main struct {
 	Name              string `validate:"required"`
 	Email             string `validate:"required,email"`
 	Password          string `validate:"required"`
-	Gender            string `validate:"oneof=Man Woman"`
+	Gender            string `validate:"oneof=male female"`
 	Age               int
 	Address           string
 	SaldoPoints       int
