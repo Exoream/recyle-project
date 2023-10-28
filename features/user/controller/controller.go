@@ -95,7 +95,7 @@ func (uco *UserController) GetUser(c echo.Context) error {
 	idParamStr := c.Param("id")
 	idParam, errId := uuid.Parse(idParamStr)
 	if errId != nil {
-		return c.JSON(http.StatusBadRequest, helper.ErrorResponse("Invalid UUID format"))
+		return c.JSON(http.StatusBadRequest, helper.ErrorResponse("invalid UUID format"))
 	}
 
 	// Periksa apakah ID dari token sama dengan ID dari parameter URL.
@@ -178,7 +178,7 @@ func (uco *UserController) Delete(c echo.Context) error {
 	idParamStr := c.Param("id")
 	idParam, errId := uuid.Parse(idParamStr)
 	if errId != nil {
-		return c.JSON(http.StatusBadRequest, helper.ErrorResponse("Invalid UUID format"))
+		return c.JSON(http.StatusBadRequest, helper.ErrorResponse("invalid UUID format"))
 	}
 
 	if idToken.String() == idParam.String() || role == "admin" {
@@ -241,5 +241,5 @@ func (uco *UserController) VerifyAccount(c echo.Context) error {
 	}
 
 	emailContent, _ := email.ParseTemplate("success_verification.html", nil)
-    return c.HTML(http.StatusOK, emailContent)
+	return c.HTML(http.StatusOK, emailContent)
 }

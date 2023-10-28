@@ -71,7 +71,7 @@ func (uco *RubbishController) GetRubbish(c echo.Context) error {
 	idParamStr := c.Param("id")
 	idParam, errId := uuid.Parse(idParamStr)
 	if errId != nil {
-		return c.JSON(http.StatusBadRequest, helper.ErrorResponse("Invalid UUID format"))
+		return c.JSON(http.StatusBadRequest, helper.ErrorResponse("invalid UUID format"))
 	}
 
 	// Izinkan akses ke data sampah (rubbish) berdasarkan ID tanpa pemeriksaan tambahan.
@@ -97,7 +97,7 @@ func (uco *RubbishController) UpdateRubbish(c echo.Context) error {
         idParamStr := c.Param("id")
         idParam, errId := uuid.Parse(idParamStr)
         if errId != nil {
-            return c.JSON(http.StatusBadRequest, helper.ErrorResponse("Invalid UUID format"))
+            return c.JSON(http.StatusBadRequest, helper.ErrorResponse("invalid UUID format"))
         }
 
         rubbishReq := RubbishRequest{}
@@ -110,7 +110,7 @@ func (uco *RubbishController) UpdateRubbish(c echo.Context) error {
 
         image, err := c.FormFile("image_url")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error uploading image"+ err.Error()))
+			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error uploading image" + err.Error()))
 		}
 
         data, err := uco.rubbishUseCase.UpdateById(idParam.String(), userMain, image)
@@ -137,7 +137,7 @@ func (uco *RubbishController) DeleteRubbish(c echo.Context) error {
         idParamStr := c.Param("id")
         idParam, errId := uuid.Parse(idParamStr)
         if errId != nil {
-            return c.JSON(http.StatusBadRequest, helper.ErrorResponse("Invalid UUID format"))
+            return c.JSON(http.StatusBadRequest, helper.ErrorResponse("invalid UUID format"))
         }
 
         err := uco.rubbishUseCase.DeleteById(idParam.String())
@@ -166,11 +166,11 @@ func (uco *RubbishController) GetAllRubbish(c echo.Context) error {
 
 	rubbishGetAllData := make([]RubbishRespon, 0)
 	for _, value := range responseData {
-		userResponse := MainResponse(value)
-		rubbishGetAllData = append(rubbishGetAllData, userResponse)
+		rubbishResponse := MainResponse(value)
+		rubbishGetAllData = append(rubbishGetAllData, rubbishResponse)
 	}
 
-	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("Success get all user rubbish", rubbishGetAllData))
+	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success get all rubbish", rubbishGetAllData))
 }
 
 func (uco *RubbishController) GetRubbishByType(c echo.Context) error {
@@ -184,7 +184,7 @@ func (uco *RubbishController) GetRubbishByType(c echo.Context) error {
     typeRubbish := c.QueryParam("type")
     result, err := uco.rubbishUseCase.GetByType(typeRubbish)
     if err != nil {
-        return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("error reading location data"))
+        return c.JSON(http.StatusInternalServerError, helper.ErrorResponse("error reading data"))
     }
 
     var rubbishResponse []RubbishRespon

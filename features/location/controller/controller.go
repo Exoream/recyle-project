@@ -178,9 +178,9 @@ func (uco *LocationController) GetAllLocation(c echo.Context) error {
 
 	locationGetAllData := make([]LocationRespon, 0)
 	for _, value := range responseData {
-		userResponse := MainResponse(value)
-		locationGetAllData = append(locationGetAllData, userResponse)
+		locationResponse := MainResponse(value)
+		locationGetAllData = append(locationGetAllData, locationResponse)
 	}
 
-	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success get all user rubbish", locationGetAllData))
+	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success get all location", locationGetAllData))
 }
