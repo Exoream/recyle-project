@@ -13,7 +13,7 @@ type DetailPickup struct {
 	RubbishId   string         `gorm:"type:varchar(100);foreignKey:RubbishId" json:"rubbish_id"`
 	Rubbish     model.Rubbish  `gorm:"foreignKey:RubbishId"`
 	ItemWeight  float64        `gorm:"not null" json:"item_weight"`
-	TotalPoints float64        `gorm:"not null" json:"total_points"`
+	TotalPoints float64        `gorm:"type:decimal(10,2);not null" json:"total_points"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
