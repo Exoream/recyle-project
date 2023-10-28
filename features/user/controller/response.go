@@ -22,7 +22,7 @@ type UserResponse struct {
 	Gender      string                    `json:"gender"`
 	Age         int                       `json:"age"`
 	Address     string                    `json:"address"`
-	SaldoPoints int                   `json:"saldo_points"`
+	SaldoPoints int                       `json:"saldo_points"`
 	CreatedAt   time.Time                 `json:"created_at"`
 	Pickup      []controller.PickupRespon `json:"pickup"`
 }

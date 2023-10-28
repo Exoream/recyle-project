@@ -49,7 +49,7 @@ func (uco *PickupController) CreatePickup(c echo.Context) error {
 	if role == "user" && data.UserId == idToken.String() {
 		image, err := c.FormFile("image_url")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error uploading image"+err.Error()))
+			return c.JSON(http.StatusBadRequest, helper.ErrorResponse("error uploading image " + err.Error()))
 		}
 
 		errCreate := uco.pickupUseCase.Create(data, image)
@@ -57,7 +57,7 @@ func (uco *PickupController) CreatePickup(c echo.Context) error {
 			if strings.Contains(errCreate.Error(), "validation") {
 				return c.JSON(http.StatusBadRequest, helper.ErrorResponse(errCreate.Error()))
 			} else {
-				return c.JSON(http.StatusBadRequest, helper.ErrorResponse("failed to create data:"+errCreate.Error()))
+				return c.JSON(http.StatusBadRequest, helper.ErrorResponse("failed to create data: "+ errCreate.Error()))
 			}
 		}
 

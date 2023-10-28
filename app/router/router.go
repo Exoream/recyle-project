@@ -83,7 +83,7 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	rubbish.PUT("/:id", rubbishController.UpdateRubbish, middlewares.JWTMiddleware())
 	rubbish.DELETE("/:id", rubbishController.DeleteRubbish, middlewares.JWTMiddleware())
 
-	location := e.Group("/location")
+	location := e.Group("/locations")
 	location.POST("", locationController.CreateLocation, middlewares.JWTMiddleware())
 	location.GET("", locationController.GetAllLocation, middlewares.JWTMiddleware())
 	location.GET("/city", locationController.GetLocationByCity, middlewares.JWTMiddleware())
@@ -91,14 +91,14 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	location.PUT("/:id", locationController.UpdateLocation, middlewares.JWTMiddleware())
 	location.DELETE("/:id", locationController.DeleteLocation, middlewares.JWTMiddleware())
 
-	pickup := e.Group("/pickup")
+	pickup := e.Group("/pickups")
 	pickup.POST("", pickupController.CreatePickup, middlewares.JWTMiddleware())
 	pickup.PUT("/:id", pickupController.UpdatePickup, middlewares.JWTMiddleware())
 	pickup.DELETE("/:id", pickupController.DeletePickup, middlewares.JWTMiddleware())
 	pickup.GET("", pickupController.GetAllPickup, middlewares.JWTMiddleware())
 	pickup.GET("/status", pickupController.GetDataByStatus, middlewares.JWTMiddleware())
 
-	detailPickup := e.Group("/detail/pickup")
+	detailPickup := e.Group("/details/pickups")
 	detailPickup.POST("", detailPickupController.CreateDetailPickup, middlewares.JWTMiddleware())
 	detailPickup.GET("", detailPickupController.GetAllDetailPickup, middlewares.JWTMiddleware())
 
