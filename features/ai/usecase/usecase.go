@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"recycle/features/ai/entity"
+	"strings"
 
 	openai "github.com/sashabaranov/go-openai"
 )
@@ -22,9 +23,19 @@ func NewAIUsecase(userInput entity.UseCaseInterface, openAIKey string) entity.Us
 
 // RecommendRecyclable implements entity.UseCaseInterface.
 func (uc *RubbishUseCase) RecommendRecyclable(itemName string) (string, error) {
-	chatSystem := "Selamat datang! Saya adalah sistem yang dapat memberikan informasi tentang jenis sampah yang bisa didaur ulang, tujuan penggunaan sampah daur ulangnya, dan fun fact tentang sampah tersebut."
-	if itemName == "" {
-		return "", errors.New("type field is required")
+	chatSystem := "Saya adalah sebuah sistem yang dapat menjelaskan jenis sampah yang bisa didaur ulang dan memberikan penjelasan contoh-contoh sampahnya secara rinci berdasarkan inputan type nya. Kemudian saya dapat menjelaskan fungsi dan kegunaan daur ulang dari sampah bersadarkan type tersebut dan terakhir memberikan func fact terhadap jenis sampah yang diinputkan"
+	itemName = strings.ToLower(itemName)
+	validItems := []string{"plastik", "kertas", "logam", "kaca", "karton"}
+	isValidItem := false
+	for _, validItem := range validItems {
+		if itemName == validItem {
+			isValidItem = true
+			break
+		}
+	}
+
+	if !isValidItem {
+		return "", errors.New("Jenis sampah yang dimasukkan tidak valid. Mohon pastikan Anda memberikan jenis sampah yang benar. Contoh: 'Kertas', 'Plastik', 'Logam', 'Kaca', atau 'Karton'.")
 	}
 
 	ctx := context.Background()

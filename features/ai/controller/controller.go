@@ -28,13 +28,25 @@ func (uc *RubbishController) GetRecyclableRecommendation(c echo.Context) error {
 	}
 
 	result, err := uc.rubbishUseCase.RecommendRecyclable(requestBody.Type)
+
+	var status string
+	var responseMessage string
+
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "failed to get data")
+		status = "error"
+		responseMessage = err.Error()
+	} else {
+		status = "success"
+		responseMessage = result
 	}
 
 	response := RubbishResponse{
-		Status: "success",
-		Result: result,
+		Status: status,
+		Result: responseMessage,
+	}
+
+	if status == "error" {
+		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	return c.JSON(http.StatusOK, response)
