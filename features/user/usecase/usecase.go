@@ -29,6 +29,10 @@ func (uc *userUseCase) Create(data entity.Main) (string, error) {
 		return "", errValidate
 	}
 
+	if len(data.Password) < 8 {
+		return "", errors.New("your password too short")
+	}
+
 	hashedPassword, errHash := helper.HashPassword(data.Password)
 	if errHash != nil {
 		return "", errors.New("error hash password")
@@ -37,8 +41,8 @@ func (uc *userUseCase) Create(data entity.Main) (string, error) {
 	data.Password = hashedPassword
 	data.SaldoPoints = 0
 	data.Role = "user"
-
 	uniqueToken, err := uc.userRepo.Create(data)
+	
 	if err != nil {
 		return "", err
 	}
@@ -53,7 +57,6 @@ func (uc *userUseCase) CheckLogin(email string, password string) (entity.Main, s
 	}
 
 	dataLogin, err := uc.userRepo.CheckLogin(email, password)
-
 	if err != nil {
 		return entity.Main{}, "", err
 	}
@@ -91,11 +94,10 @@ func (uc *userUseCase) UpdateById(id string, updated entity.Main) (data entity.M
 	}
 
 	if updated.Password != "" {
-		hash, hashErr := helper.HashPassword(updated.Password)
+		_, hashErr := helper.HashPassword(updated.Password)
 		if hashErr != nil {
 			return entity.Main{}, hashErr
 		}
-		updated.Password = hash
 	}
 
 	data, err = uc.userRepo.UpdateById(id, updated)
