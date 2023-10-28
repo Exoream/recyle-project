@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"errors"
+	"net/http"
 	"os"
 	"time"
 
@@ -17,19 +18,19 @@ func JWTMiddleware() echo.MiddlewareFunc {
 	return echojwt.WithConfig(echojwt.Config{
 		SigningKey:    []byte(os.Getenv("JWT_SECRET")),
 		SigningMethod: "HS256",
+		TokenLookup:   "cookie:token",
 	})
 }
 
 func CreateToken(userId uuid.UUID, role string) (string, error) {
-    claims := jwt.MapClaims{}
-    claims["authorized"] = true
-    claims["userId"] = userId.String()
-    claims["role"] = role
-    claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
-    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	claims := jwt.MapClaims{}
+	claims["authorized"] = true
+	claims["userId"] = userId.String()
+	claims["role"] = role
+	claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }
-
 
 func ExtractToken(e echo.Context) uuid.UUID {
 	user := e.Get("user").(*jwt.Token)
@@ -47,12 +48,21 @@ func ExtractToken(e echo.Context) uuid.UUID {
 }
 
 func ExtractRole(c echo.Context) (string, error) {
-    user := c.Get("user").(*jwt.Token)
-    claims := user.Claims.(jwt.MapClaims)
-    role, ok := claims["role"].(string)
-    if !ok {
-        return "", errors.New("role not found in token claims")
-    }
-    return role, nil
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	role, ok := claims["role"].(string)
+	if !ok {
+		return "", errors.New("role not found in token claims")
+	}
+	return role, nil
 }
 
+func TokenCookie(e echo.Context, token string) {
+	cookie := new(http.Cookie)
+	cookie.Name = "token"
+	cookie.Value = token
+	// Set cookies all path
+	cookie.Path = "/"
+
+	e.SetCookie(cookie)
+}
