@@ -73,7 +73,7 @@ func (uco *UserController) Login(c echo.Context) error {
 	if !user.IsVerified {
 		return c.JSON(http.StatusUnauthorized, helper.ErrorResponse("account not verified"))
 	}
-
+	middlewares.TokenCookie(c, token)
 	response := LoginResponse(user.Id, user.Email, token)
 
 	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("login successful", response))
