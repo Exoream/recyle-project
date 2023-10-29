@@ -13,7 +13,7 @@ type User struct {
 	Email             string         `gorm:"type:varchar(255);unique;not null" json:"email"`
 	Password          string         `gorm:"type:text;not null" json:"password"`
 	Gender            string         `gorm:"type:enum('male','female')" json:"gender"`
-	Age               int            `json:"age"`
+	Age               int            `gorm:"type:int(5)" json:"age"`
 	Address           string         `gorm:"type:longtext" json:"address"`
 	SaldoPoints       int            `json:"saldo_points"`
 	Role              string         `gorm:"type:varchar(10)" json:"role"`
