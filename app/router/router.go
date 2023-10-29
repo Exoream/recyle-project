@@ -23,8 +23,8 @@ import (
 	detailPickupRepository "recycle/features/detail_pickup/repository"
 	detailPickupUsecase "recycle/features/detail_pickup/usecase"
 
-	aiUsecase "recycle/features/ai/usecase"
 	aiController "recycle/features/ai/controller"
+	aiUsecase "recycle/features/ai/usecase"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -58,9 +58,7 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	detailPickupController := detailPickupController.NewPickupControllers(detailPickupUsecase, pickupUsecase, userUsecase)
 
 	// AI
-	if err := godotenv.Load(); err != nil {
-		panic("Error loading .env file")
-	}
+	godotenv.Load()
 	openaiKey := os.Getenv("OPENAI_API_KEY")
 	aiUsecase := aiUsecase.NewAIUsecase(nil, openaiKey)
 	aiController := aiController.NewRubbishController(aiUsecase)
